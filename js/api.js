@@ -73,22 +73,66 @@ const GraphAPI = (function () {
     return pagePost(pageToken, `/${pageId}/messages`, body);
   }
 
-  async function getPagePosts(pageId, pageToken, limit = 15) {
-    const fields = 'id,message,created_time,permalink_url,likes.summary(true),comments.summary(true),shares';
-    const paths = [
-      `/${pageId}/posts?fields=${fields}&limit=${limit}`,
-      `/${pageId}/feed?fields=${fields}&limit=${limit}`,
-      `/${pageId}/published_posts?fields=${fields}&limit=${limit}`,
+  /**
+   * Load Page content — tries multiple Graph endpoints, returns debug log on failure
+   */
+  async function getPagePosts(pageId, pageToken, limit = 25) {
+    const attempts = [
+      {
+        name: 'posts (basic)',
+        path: `/${pageId}/posts?fields=id,message,created_time,permalink_url&limit=${limit}`,
+      },
+      {
+        name: 'posts + engagement',
+        path: `/${pageId}/posts?fields=id,message,created_time,permalink_url,likes.summary(true),comments.summary(true),shares&limit=${limit}`,
+      },
+      {
+        name: 'feed',
+        path: `/${pageId}/feed?fields=id,message,created_time,permalink_url,likes.summary(true),comments.summary(true)&limit=${limit}`,
+      },
+      {
+        name: 'published_posts',
+        path: `/${pageId}/published_posts?fields=id,message,created_time&limit=${limit}`,
+      },
+      {
+        name: 'videos',
+        path: `/${pageId}/videos?fields=id,title,description,created_time,permalink_url&limit=${limit}`,
+      },
     ];
-    for (const path of paths) {
+
+    const debug = [];
+
+    for (const a of attempts) {
       try {
-        const res = await pageGet(pageToken, path);
-        if (res.data?.length) return res.data;
-      } catch {
-        /* try next endpoint */
+        const res = await pageGet(pageToken, a.path);
+        const items = (res.data || []).map(normalizePostItem);
+        if (items.length) {
+          return { posts: items, source: a.name, debug: [...debug, `${a.name}: ✓ ${items.length} item(s)`] };
+        }
+        debug.push(`${a.name}: 0 results (API OK but empty)`);
+      } catch (e) {
+        debug.push(`${a.name}: ✗ ${e.message}`);
       }
     }
-    return [];
+
+    const err = new Error(
+      'Facebook returned no posts for this Page. See debug details below — usually pages_read_engagement is missing on login token.'
+    );
+    err.debug = debug;
+    err.code = 'NO_POSTS';
+    throw err;
+  }
+
+  function normalizePostItem(item) {
+    return {
+      id: item.id,
+      message: item.message || item.title || item.description || '(Media post)',
+      created_time: item.created_time,
+      permalink_url: item.permalink_url,
+      likes: item.likes,
+      comments: item.comments,
+      shares: item.shares,
+    };
   }
 
   function extractCustomerFromConversation(conv, pageId) {

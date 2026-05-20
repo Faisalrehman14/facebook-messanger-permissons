@@ -2,15 +2,50 @@ const Engagement = (function () {
   'use strict';
 
   async function load(page) {
+    const feed = document.getElementById('posts-feed');
+    const stats = document.getElementById('engagement-stats');
+    if (feed) feed.innerHTML = '<p class="empty-state">Loading posts from Facebook…</p>';
+
     try {
-      const posts = await GraphAPI.getPagePosts(page.id, page.access_token);
-      renderStats(posts);
-      renderPosts(posts);
+      const result = await GraphAPI.getPagePosts(page.id, page.access_token);
+      renderStats(result.posts);
+      renderPosts(result.posts, result.source, result.debug);
       return { ok: true };
     } catch (e) {
-      showPermissionError(e.message);
+      if (stats) stats.innerHTML = '';
+      if (e.code === 'NO_POSTS' && e.debug) {
+        showNoPostsDebug(page, e.debug);
+      } else {
+        showPermissionError(e.message);
+      }
       return { ok: false, error: e.message };
     }
+  }
+
+  function showNoPostsDebug(page, debugLines) {
+    const feed = document.getElementById('posts-feed');
+    if (feed) {
+      feed.innerHTML = `
+        <div class="empty-inbox-guide">
+          <h4>⚠️ Facebook API: 0 posts returned</h4>
+          <p>Page: <strong>${escape(page.name)}</strong> (ID: ${page.id})</p>
+          <p>Posts Facebook app par dikh sakti hain lekin API ne koi post nahi di. Usually <code>pages_read_engagement</code> allow nahi ya post type alag hai (Reel/Story).</p>
+          <p><strong>API debug:</strong></p>
+          <pre class="api-debug">${debugLines.map(escape).join('\n')}</pre>
+          <p><strong>Fix:</strong></p>
+          <ol>
+            <li><strong>Sign out</strong> → Connect with Facebook → <strong>Allow ALL</strong> permissions</li>
+            <li>Meta App → Permissions → <code>pages_read_engagement</code> added in Messenger use case</li>
+            <li>Facebook Page par ek normal <strong>text/photo post</strong> karein (Reel/Story only kabhi empty hota)</li>
+            <li>Graph API Explorer: <code>GET ${page.id}/posts?fields=id,message</code> with Page token</li>
+          </ol>
+          <button type="button" class="btn-primary" id="btn-retry-engagement">Retry</button>
+        </div>`;
+      document.getElementById('btn-retry-engagement')?.addEventListener('click', () => {
+        if (typeof refreshEngagement === 'function') refreshEngagement();
+      });
+    }
+    if (typeof Readiness !== 'undefined') Readiness.setPosts(false);
   }
 
   function showPermissionError(msg) {
@@ -20,14 +55,9 @@ const Engagement = (function () {
     if (feed) {
       feed.innerHTML = `
         <div class="empty-inbox-guide">
-          <h4>⚠️ pages_read_engagement required</h4>
+          <h4>⚠️ Permission error</h4>
           <p>${escape(msg)}</p>
-          <p><strong>Fix:</strong></p>
-          <ol>
-            <li>Meta App → App Review → add <code>pages_read_engagement</code></li>
-            <li>Sign out → Connect with Facebook again → <strong>Allow all</strong> permissions</li>
-            <li>Until approved: use account added as <strong>Tester</strong> in App Roles</li>
-          </ol>
+          <p><strong>Fix:</strong> Sign out → login again → Allow <code>pages_read_engagement</code></p>
         </div>`;
     }
     if (typeof Readiness !== 'undefined') Readiness.setPosts(false);
@@ -50,32 +80,26 @@ const Engagement = (function () {
       <div class="stat-card"><span class="stat-val">${shares}</span><span class="stat-label">Shares</span></div>`;
   }
 
-  function renderPosts(posts) {
+  function renderPosts(posts, source, debug) {
     const feed = document.getElementById('posts-feed');
-    if (!posts.length) {
-      feed.innerHTML = `
-        <div class="empty-inbox-guide">
-          <h4>⚠️ No posts on this Page</h4>
-          <p>Meta reviewers need to see engagement data. Create at least one post on Facebook, then Refresh.</p>
-        </div>`;
-      if (typeof Readiness !== 'undefined') Readiness.setPosts(false);
-      return;
-    }
     if (typeof Readiness !== 'undefined') {
       Readiness.setPosts(true);
       Readiness.markDemo('pages_read_engagement');
     }
 
-    feed.innerHTML = posts
-      .map((p) => {
-        const likes = p.likes?.summary?.total_count ?? 0;
-        const comments = p.comments?.summary?.total_count ?? 0;
-        const shares = p.shares?.count ?? 0;
-        const date = p.created_time ? new Date(p.created_time).toLocaleString() : '';
-        const link = p.permalink_url
-          ? `<a href="${p.permalink_url}" target="_blank" rel="noopener">View on Facebook</a>`
-          : '';
-        return `
+    const srcNote = source ? `<p class="meta-muted">Loaded via: ${escape(source)}</p>` : '';
+    feed.innerHTML =
+      srcNote +
+      posts
+        .map((p) => {
+          const likes = p.likes?.summary?.total_count ?? 0;
+          const comments = p.comments?.summary?.total_count ?? 0;
+          const shares = p.shares?.count ?? 0;
+          const date = p.created_time ? new Date(p.created_time).toLocaleString() : '';
+          const link = p.permalink_url
+            ? `<a href="${p.permalink_url}" target="_blank" rel="noopener">View on Facebook</a>`
+            : '';
+          return `
           <article class="post-card">
             <p class="post-text">${escape(p.message || '(Media post)')}</p>
             <div class="post-metrics">
@@ -85,8 +109,8 @@ const Engagement = (function () {
             </div>
             <footer class="post-footer"><time>${date}</time> ${link}</footer>
           </article>`;
-      })
-      .join('');
+        })
+        .join('');
     if (typeof AppReview !== 'undefined') AppReview.markPermissionUsed('pages_read_engagement');
   }
 

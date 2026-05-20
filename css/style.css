@@ -151,6 +151,10 @@ body {
 .empty-inbox-guide h4 { margin-bottom: 8px; color: #e65100; }
 .empty-inbox-guide ol { margin: 12px 0 12px 20px; }
 .empty-inbox-guide li { margin-bottom: 6px; }
+.api-debug {
+  background: #1c1e21; color: #e4e6eb; padding: 12px; border-radius: 8px;
+  font-size: .75rem; white-space: pre-wrap; margin: 12px 0; max-height: 160px; overflow: auto;
+}
 
 .landing-main { max-width: 960px; margin: 0 auto; padding: 48px 24px 80px; }
 .landing-hero h1 { font-size: 2.4rem; line-height: 1.15; margin-bottom: 16px; max-width: 640px; }
