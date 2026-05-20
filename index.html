@@ -13,7 +13,10 @@
       <svg viewBox="0 0 36 36" width="36" height="36"><circle cx="18" cy="18" r="18" fill="#0084FF"/><path fill="#fff" d="M10 18.5c0-4.4 3.6-8 8-8s8 3.6 8 8-3.6 8-8 8c-1.5 0-2.9-.4-4.1-1.1L10 26l.9-3.6A7.9 7.9 0 0110 18.5z"/></svg>
       <span>PageChat Hub</span>
     </div>
-    <a href="privacy.html" class="link-muted">Privacy</a>
+    <nav class="landing-links">
+      <a href="privacy.html" class="link-muted">Privacy</a>
+      <a href="data-deletion.html" class="link-muted">Data Deletion</a>
+    </nav>
   </header>
 
   <main class="landing-main">
@@ -70,7 +73,7 @@
   </main>
 
   <footer class="landing-footer">
-    <p>&copy; PageChat Hub · <a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms</a></p>
+    <p>&copy; PageChat Hub · <a href="privacy.html">Privacy</a> · <a href="data-deletion.html">Data Deletion</a> · <a href="terms.html">Terms</a></p>
   </footer>
 
   <!-- Main app (hidden until login) -->
@@ -82,7 +85,7 @@
       </div>
 
       <div class="page-picker">
-        <label>Active Page</label>
+        <label>Active Page <span class="perm-badge-sm">pages_show_list</span></label>
         <select id="page-select"></select>
       </div>
 
@@ -97,15 +100,19 @@
         <button type="button" class="nav-item" data-view="utility">
           <span class="nav-icon">📦</span> Utility Messages
         </button>
+        <button type="button" class="nav-item" data-view="review">
+          <span class="nav-icon">✅</span> App Review
+        </button>
         <button type="button" class="nav-item" data-view="settings">
           <span class="nav-icon">⚙️</span> Settings
         </button>
       </nav>
 
-      <div class="sidebar-user">
+      <div class="sidebar-user" title="public_profile">
         <img id="sidebar-avatar" alt="" />
         <div>
           <div id="sidebar-name" class="user-name"></div>
+          <span class="perm-badge-sm">public_profile</span>
           <button type="button" id="btn-logout" class="btn-text">Sign out</button>
         </div>
       </div>
@@ -115,9 +122,13 @@
       <!-- INBOX -->
       <section class="view active" id="view-inbox">
         <header class="view-header">
-          <h1>Inbox</h1>
+          <div>
+            <span class="perm-badge">pages_messaging</span>
+            <h1>Inbox</h1>
+          </div>
           <button type="button" id="btn-refresh-inbox" class="btn-outline-sm">Refresh</button>
         </header>
+        <p class="perm-use-line">Read customer Messenger threads and send support replies on behalf of your Page.</p>
         <div class="inbox-layout">
           <div class="conv-list" id="conv-list">
             <p class="empty-state">Select a Page to load conversations.</p>
@@ -143,9 +154,13 @@
       <!-- ENGAGEMENT -->
       <section class="view" id="view-engagement">
         <header class="view-header">
-          <h1>Engagement</h1>
+          <div>
+            <span class="perm-badge">pages_read_engagement</span>
+            <h1>Engagement</h1>
+          </div>
           <button type="button" id="btn-refresh-posts" class="btn-outline-sm">Refresh</button>
         </header>
+        <p class="perm-use-line">View Page posts and engagement metrics (likes, comments, shares).</p>
         <div class="stats-row" id="engagement-stats"></div>
         <div class="posts-feed" id="posts-feed"></div>
       </section>
@@ -153,9 +168,12 @@
       <!-- UTILITY -->
       <section class="view" id="view-utility">
         <header class="view-header">
-          <h1>Utility Messages</h1>
+          <div>
+            <span class="perm-badge">pages_utility_messaging</span>
+            <h1>Utility Messages</h1>
+          </div>
         </header>
-        <p class="view-desc">Send transactional updates (orders, appointments, account alerts) to customers who messaged your Page.</p>
+        <p class="perm-use-line">Send order confirmations, shipping updates, and account alerts to customers who contacted your Page.</p>
         <form class="utility-form" id="utility-form">
           <label>Customer (from inbox)</label>
           <select id="utility-recipient">
@@ -174,6 +192,29 @@
         <div id="utility-status" class="status-msg hidden"></div>
       </section>
 
+      <!-- APP REVIEW -->
+      <section class="view" id="view-review">
+        <header class="view-header">
+          <h1>App Review Checklist</h1>
+          <button type="button" id="btn-start-review-guide" class="btn-primary">Start walkthrough</button>
+        </header>
+        <p class="perm-use-line">Complete each step, then submit in Meta Developer portal. Green ✓ = ready for screencast.</p>
+        <ul class="review-checklist" id="review-checklist">
+          <li id="check-profile"><span class="check-icon">○</span> <code>public_profile</code> — User name visible in sidebar</li>
+          <li id="check-pages"><span class="check-icon">○</span> <code>pages_show_list</code> — Page dropdown loaded</li>
+          <li id="check-messaging"><span class="check-icon">○</span> <code>pages_messaging</code> — Reply sent from Inbox</li>
+          <li id="check-engagement"><span class="check-icon">○</span> <code>pages_read_engagement</code> — Posts loaded in Engagement</li>
+          <li id="check-utility"><span class="check-icon">○</span> <code>pages_utility_messaging</code> — Utility message sent</li>
+        </ul>
+        <h3 class="subsection-title">Copy permission answers for Meta form</h3>
+        <div id="permission-answers"></div>
+        <h3 class="subsection-title">URLs for Meta Basic Settings</h3>
+        <ul class="url-list" id="meta-urls"></ul>
+        <h3 class="subsection-title">Test instructions</h3>
+        <textarea id="review-notes" readonly rows="12"></textarea>
+        <button type="button" id="btn-copy-notes" class="btn-outline-sm">Copy test instructions</button>
+      </section>
+
       <!-- SETTINGS -->
       <section class="view" id="view-settings">
         <header class="view-header"><h1>Settings</h1></header>
@@ -189,9 +230,8 @@
             </ol>
           </div>
           <div class="settings-block">
-            <h3>App Review test notes</h3>
-            <textarea id="review-notes" readonly rows="10"></textarea>
-            <button type="button" id="btn-copy-notes" class="btn-outline-sm">Copy for Meta submission</button>
+            <h3>Full App Review guide</h3>
+            <p>See <a href="APP_REVIEW.md" target="_blank">APP_REVIEW.md</a> in the repository for step-by-step Meta portal instructions (Urdu + English).</p>
           </div>
         </div>
       </section>
@@ -207,6 +247,7 @@
   <script src="js/inbox.js"></script>
   <script src="js/engagement.js"></script>
   <script src="js/utility.js"></script>
+  <script src="js/review.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

@@ -10,8 +10,8 @@
   document.addEventListener('DOMContentLoaded', init);
 
   async function init() {
+    AppReview.init();
     bindUI();
-    setReviewNotes();
     await bootstrapAuth();
   }
 
@@ -67,6 +67,7 @@
     document.getElementById('composer-form')?.addEventListener('submit', onSendReply);
     document.getElementById('utility-form')?.addEventListener('submit', onSendUtility);
     document.getElementById('btn-copy-notes')?.addEventListener('click', copyNotes);
+    document.getElementById('btn-start-review-guide')?.addEventListener('click', () => AppReview.openGuide(0));
 
     document.querySelectorAll('.nav-item').forEach((btn) => {
       btn.addEventListener('click', () => switchView(btn.dataset.view));
@@ -120,6 +121,8 @@
       const saved = localStorage.getItem(FB_CONFIG.storageKeys.activePageId);
       if (saved && pages.find((p) => p.id === saved)) sel.value = saved;
       await setActivePage(pages.find((p) => p.id === sel.value) || pages[0]);
+      AppReview.renderSettingsBlocks(window.location.origin);
+      AppReview.onLoginComplete();
       toast('Welcome, ' + user.name);
     } catch (e) {
       toast(e.message, true);
@@ -136,6 +139,7 @@
     Inbox.stopPolling();
     await Inbox.load(page);
     await Engagement.load(page);
+    AppReview.markPermissionUsed('pages_read_engagement');
     Inbox.startPolling(page);
   }
 
@@ -153,6 +157,7 @@
   async function refreshEngagement() {
     if (!activePage) return;
     await Engagement.load(activePage);
+    AppReview.markPermissionUsed('pages_read_engagement');
     toast('Engagement updated');
   }
 
@@ -162,6 +167,7 @@
     try {
       await Inbox.sendReply(activePage, input.value);
       input.value = '';
+      AppReview.markPermissionUsed('pages_messaging');
       toast('Message sent');
     } catch (err) {
       toast(err.message, true);
@@ -179,6 +185,7 @@
     }
     try {
       await Utility.send(activePage, psid, text, tag);
+      AppReview.markPermissionUsed('pages_utility_messaging');
       Utility.showStatus('Utility message sent successfully.', true);
       toast('Utility message sent');
     } catch (err) {
@@ -197,31 +204,19 @@
   function switchView(name) {
     document.querySelectorAll('.nav-item').forEach((n) => n.classList.toggle('active', n.dataset.view === name));
     document.querySelectorAll('.view').forEach((v) => v.classList.toggle('active', v.id === 'view-' + name));
+    if (name === 'settings') setupSettingsUrls();
   }
 
-  function setReviewNotes() {
+  window.switchView = switchView;
+  window.toast = toast;
+
+  function setupSettingsUrls() {
     const origin = window.location.origin;
     const webhook = `${origin}/webhook`;
-
-    document.getElementById('webhook-callback').textContent = webhook;
-    document.getElementById('webhook-url-display').textContent = webhook;
-
-    document.getElementById('review-notes').value = `PageChat Hub — Meta App Review Test Guide
-==========================================
-App URL: ${origin}/
-
-WHAT THIS APP DOES:
-PageChat Hub is a customer support inbox for Facebook Page owners. Users sign in with Facebook, select their Page, read Messenger conversations, reply to customers, view engagement, and send utility updates.
-
-TEST STEPS:
-1. Click "Connect with Facebook" and log in.
-2. Select a Page from the dropdown.
-3. INBOX: Open a conversation and send a reply.
-4. ENGAGEMENT: View posts and metrics.
-5. UTILITY: Send an order/shipping update to a customer from the list.
-
-Test account: [YOUR EMAIL]
-Test Page: [YOUR PAGE NAME]`;
+    const cb = document.getElementById('webhook-callback');
+    const wd = document.getElementById('webhook-url-display');
+    if (cb) cb.textContent = webhook;
+    if (wd) wd.textContent = webhook;
   }
 
   function copyNotes() {

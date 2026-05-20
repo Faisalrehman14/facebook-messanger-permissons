@@ -52,6 +52,7 @@ const Engagement = (function () {
           </article>`;
       })
       .join('');
+    if (typeof AppReview !== 'undefined') AppReview.markPermissionUsed('pages_read_engagement');
   }
 
   function escape(s) {
