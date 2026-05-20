@@ -61,7 +61,10 @@ const Engagement = (function () {
       if (typeof Readiness !== 'undefined') Readiness.setPosts(false);
       return;
     }
-    if (typeof Readiness !== 'undefined') Readiness.setPosts(true);
+    if (typeof Readiness !== 'undefined') {
+      Readiness.setPosts(true);
+      Readiness.markDemo('pages_read_engagement');
+    }
 
     feed.innerHTML = posts
       .map((p) => {

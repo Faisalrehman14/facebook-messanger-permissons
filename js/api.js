@@ -75,11 +75,20 @@ const GraphAPI = (function () {
 
   async function getPagePosts(pageId, pageToken, limit = 15) {
     const fields = 'id,message,created_time,permalink_url,likes.summary(true),comments.summary(true),shares';
-    const res = await pageGet(
-      pageToken,
-      `/${pageId}/posts?fields=${fields}&limit=${limit}`
-    );
-    return res.data || [];
+    const paths = [
+      `/${pageId}/posts?fields=${fields}&limit=${limit}`,
+      `/${pageId}/feed?fields=${fields}&limit=${limit}`,
+      `/${pageId}/published_posts?fields=${fields}&limit=${limit}`,
+    ];
+    for (const path of paths) {
+      try {
+        const res = await pageGet(pageToken, path);
+        if (res.data?.length) return res.data;
+      } catch {
+        /* try next endpoint */
+      }
+    }
+    return [];
   }
 
   function extractCustomerFromConversation(conv, pageId) {

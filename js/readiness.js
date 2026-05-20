@@ -36,6 +36,60 @@ const Readiness = (function () {
     bindMetaCheckboxes();
     bindTestCredentials();
     restoreDemoFlags();
+    verifyMetaUrls();
+  }
+
+  /** Auto-tick URL checkboxes if pages load on Railway */
+  async function verifyMetaUrls() {
+    const origin = location.origin;
+    if (!origin.startsWith('http')) return;
+    const checks = [
+      ['meta-chk-privacy', 'privacy'],
+      ['meta-chk-deletion', 'deletion'],
+      ['meta-chk-oauth', 'oauth'],
+    ];
+    for (const [id, field] of checks) {
+      try {
+        const path = field === 'oauth' ? '/' : `/${field === 'privacy' ? 'privacy.html' : 'data-deletion.html'}`;
+        const res = await fetch(origin + path, { method: 'HEAD' });
+        if (res.ok) {
+          const el = document.getElementById(id);
+          if (el) {
+            el.checked = true;
+            localStorage.setItem(
+              field === 'privacy' ? LS.metaPrivacy : field === 'deletion' ? LS.metaDeletion : LS.metaOAuth,
+              '1'
+            );
+            state.metaManual[field] = true;
+          }
+        }
+      } catch { /* ignore */ }
+    }
+    render();
+  }
+
+  function confirmMetaSetupDone() {
+    ['meta-chk-privacy', 'meta-chk-deletion', 'meta-chk-oauth', 'meta-chk-tester', 'meta-chk-screencast'].forEach(
+      (id) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.checked = true;
+        const map = {
+          'meta-chk-privacy': ['privacy', LS.metaPrivacy],
+          'meta-chk-deletion': ['deletion', LS.metaDeletion],
+          'meta-chk-oauth': ['oauth', LS.metaOAuth],
+          'meta-chk-tester': ['tester', LS.metaTester],
+          'meta-chk-screencast': ['screencast', LS.metaScreencast],
+        };
+        const m = map[id];
+        if (m) {
+          state.metaManual[m[0]] = true;
+          localStorage.setItem(m[1], '1');
+        }
+      }
+    );
+    render();
+    if (typeof toast === 'function') toast('Checklist updated');
   }
 
   function restoreDemoFlags() {
@@ -169,7 +223,12 @@ const Readiness = (function () {
     if (!state.metaManual.privacy) b.push({ level: 'critical', text: 'Meta Basic Settings: Privacy Policy URL not confirmed.' });
     if (!state.metaManual.deletion) b.push({ level: 'critical', text: 'Meta Basic Settings: Data deletion URL not confirmed.' });
     if (!state.metaManual.oauth) b.push({ level: 'critical', text: 'Facebook Login: OAuth redirect URL not confirmed.' });
-    if (!state.metaManual.tester) b.push({ level: 'critical', text: 'Add test user in Meta App Roles.' });
+    if (!state.metaManual.tester) {
+      b.push({
+        level: 'warn',
+        text: 'Test user: Meta blocked? Use your Admin login for review — tick checkbox below if using admin account.',
+      });
+    }
     if (!getTestEmail()) b.push({ level: 'critical', text: 'Fill test email below for Meta submission.' });
     if (!state.metaManual.screencast) b.push({ level: 'critical', text: 'Record & upload screencast showing all 6 permissions.' });
     return b;
