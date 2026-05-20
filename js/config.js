@@ -11,7 +11,9 @@ const FB_CONFIG = {
     'pages_messaging',
     'pages_read_engagement',
     'pages_utility_messaging',
+    'pages_manage_metadata',
   ].join(','),
+  webhookFields: ['messages', 'messaging_postbacks', 'message_echoes'],
   storageKeys: {
     appId: 'pagechat_app_id',
     activePageId: 'pagechat_active_page',

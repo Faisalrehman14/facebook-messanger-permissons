@@ -40,6 +40,13 @@ const AppReview = (function () {
       text: 'Open Utility Messages → pick a customer → choose message type → send an order/shipping update.',
       check: 'check-utility',
     },
+    {
+      id: 'pages_manage_metadata',
+      view: 'settings',
+      title: 'Step 6: pages_manage_metadata',
+      text: 'Open Settings → click "Subscribe Page to webhooks" → see green confirmation that the Page is connected for real-time messages.',
+      check: 'check-metadata',
+    },
   ];
 
   const PERMISSION_ANSWERS = {
@@ -52,6 +59,8 @@ const AppReview = (function () {
     pages_read_engagement: `PageChat Hub uses pages_read_engagement to show Page owners how their posts perform. The Engagement screen displays recent posts with like counts, comment counts, and shares so businesses can understand customer interest and improve their content.`,
 
     pages_utility_messaging: `PageChat Hub uses pages_utility_messaging to let businesses send transactional messages customers expect, such as order confirmations, shipping updates, and appointment reminders. Users select a customer who has already messaged the Page, choose an approved message tag, and send a one-to-one utility update from the Utility Messages screen.`,
+
+    pages_manage_metadata: `PageChat Hub uses pages_manage_metadata to subscribe the user's Facebook Page to Messenger webhooks for our app. In Settings, the user clicks "Subscribe Page to webhooks" so PageChat Hub receives real-time notifications when customers send new messages. This allows timely inbox updates without manual refresh and is required for reliable customer support delivery.`,
   };
 
   let stepIndex = 0;
@@ -156,6 +165,7 @@ const AppReview = (function () {
       pages_messaging: 'check-messaging',
       pages_read_engagement: 'check-engagement',
       pages_utility_messaging: 'check-utility',
+      pages_manage_metadata: 'check-metadata',
     };
     if (map[perm]) markCheck(map[perm]);
   }
@@ -221,7 +231,12 @@ FEATURE TESTS (match screencast):
    - Select customer from dropdown (from inbox).
    - Choose "Order / shipping update", enter message, click Send.
 
-WEBHOOK (optional): ${origin}/webhook
+6) pages_manage_metadata
+   - Click Settings in sidebar.
+   - Click "Subscribe Page to webhooks".
+   - Confirm green status: Page subscribed to real-time webhooks.
+
+WEBHOOK CALLBACK: ${origin}/webhook
 Privacy Policy: ${origin}/privacy.html
 Data Deletion: ${origin}/data-deletion.html`;
   }

@@ -68,6 +68,10 @@
           <strong>pages_utility_messaging</strong>
           <p>Send order confirmations, shipping updates, and account alerts to customers who opted in.</p>
         </article>
+        <article>
+          <strong>pages_manage_metadata</strong>
+          <p>Subscribe your Page to real-time Messenger webhooks so new customer messages arrive instantly.</p>
+        </article>
       </div>
     </section>
   </main>
@@ -205,6 +209,7 @@
           <li id="check-messaging"><span class="check-icon">○</span> <code>pages_messaging</code> — Reply sent from Inbox</li>
           <li id="check-engagement"><span class="check-icon">○</span> <code>pages_read_engagement</code> — Posts loaded in Engagement</li>
           <li id="check-utility"><span class="check-icon">○</span> <code>pages_utility_messaging</code> — Utility message sent</li>
+          <li id="check-metadata"><span class="check-icon">○</span> <code>pages_manage_metadata</code> — Page webhooks subscribed in Settings</li>
         </ul>
         <h3 class="subsection-title">Copy permission answers for Meta form</h3>
         <div id="permission-answers"></div>
@@ -217,16 +222,24 @@
 
       <!-- SETTINGS -->
       <section class="view" id="view-settings">
-        <header class="view-header"><h1>Settings</h1></header>
+        <header class="view-header">
+          <div>
+            <span class="perm-badge">pages_manage_metadata</span>
+            <h1>Settings</h1>
+          </div>
+        </header>
+        <p class="perm-use-line">Connect the selected Page to real-time Messenger webhooks and manage subscription status.</p>
         <div class="settings-blocks">
           <div class="settings-block">
-            <h3>Webhook (real-time messages)</h3>
-            <p>Your Railway URL webhook (same domain as this app):</p>
+            <h3>Page webhook connection</h3>
+            <div id="webhook-status"></div>
+            <div id="webhook-actions" class="webhook-actions"></div>
+            <p class="meta-muted" style="margin-top:12px">App callback URL (Meta dashboard):</p>
             <pre class="code-block" id="webhook-url-display">Loading…</pre>
             <ol class="setup-steps">
               <li>Meta App → Messenger → Webhooks → Callback URL: <code id="webhook-callback"></code></li>
-              <li>Verify Token: set in <code>server/.env</code></li>
-              <li>Subscribe to: <code>messages</code>, <code>messaging_postbacks</code></li>
+              <li>Verify Token: Railway variable <code>VERIFY_TOKEN</code></li>
+              <li>Then click <strong>Subscribe Page to webhooks</strong> above</li>
             </ol>
           </div>
           <div class="settings-block">
@@ -247,6 +260,7 @@
   <script src="js/inbox.js"></script>
   <script src="js/engagement.js"></script>
   <script src="js/utility.js"></script>
+  <script src="js/page-meta.js"></script>
   <script src="js/review.js"></script>
   <script src="js/app.js"></script>
 </body>

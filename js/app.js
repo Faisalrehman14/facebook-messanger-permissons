@@ -141,6 +141,7 @@
     await Engagement.load(page);
     AppReview.markPermissionUsed('pages_read_engagement');
     Inbox.startPolling(page);
+    refreshPageMeta();
   }
 
   async function onPageChange(e) {
@@ -204,7 +205,17 @@
   function switchView(name) {
     document.querySelectorAll('.nav-item').forEach((n) => n.classList.toggle('active', n.dataset.view === name));
     document.querySelectorAll('.view').forEach((v) => v.classList.toggle('active', v.id === 'view-' + name));
-    if (name === 'settings') setupSettingsUrls();
+    if (name === 'settings') {
+      setupSettingsUrls();
+      refreshPageMeta();
+    }
+  }
+
+  function refreshPageMeta() {
+    if (!activePage) return;
+    const statusEl = document.getElementById('webhook-status');
+    const actionsEl = document.getElementById('webhook-actions');
+    PageMeta.refresh(activePage, statusEl, actionsEl);
   }
 
   window.switchView = switchView;

@@ -7,6 +7,7 @@ Yeh guide tumhein **5 permissions** approve karwane ke liye hai:
 - `pages_messaging`
 - `pages_read_engagement`
 - `pages_utility_messaging`
+- `pages_manage_metadata`
 
 ---
 
@@ -71,6 +72,9 @@ Ya yahan se copy karo:
 #### pages_utility_messaging
 > PageChat Hub uses pages_utility_messaging to send transactional messages (order updates, shipping, appointments) to customers who already messaged the Page.
 
+#### pages_manage_metadata
+> PageChat Hub uses pages_manage_metadata so users can subscribe their Page to Messenger webhooks in Settings, enabling real-time customer message notifications.
+
 ### Step C — Screencast video (2–4 min)
 
 Record karo — **English** mein bolna better hai:
@@ -82,6 +86,7 @@ Record karo — **English** mein bolna better hai:
 5. **Inbox** → conversation kholo → reply bhejo (`pages_messaging`)
 6. **Engagement** → posts + likes/comments (`pages_read_engagement`)
 7. **Utility** → customer select → message send (`pages_utility_messaging`)
+8. **Settings** → Subscribe Page to webhooks (`pages_manage_metadata`)
 
 ### Step D — Test instructions
 

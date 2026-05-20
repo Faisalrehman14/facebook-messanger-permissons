@@ -96,5 +96,7 @@ const GraphAPI = (function () {
     sendMessage,
     getPagePosts,
     extractCustomerFromConversation,
+    pageGet,
+    pagePost,
   };
 })();
