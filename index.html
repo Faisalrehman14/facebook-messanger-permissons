@@ -32,16 +32,13 @@
 
       <div class="login-card" id="login-card">
         <h2>Sign in with Facebook</h2>
-        <p>Connect the Facebook account that manages your Page.</p>
-        <div class="app-id-row">
-          <input type="text" id="app-id-input" placeholder="Facebook App ID" />
-          <button type="button" id="btn-save-app-id" class="btn-outline">Save</button>
-        </div>
+        <p>Use the Facebook account that manages your business Page. Anyone with Page access can sign in.</p>
         <button type="button" id="btn-login" class="btn-fb-large">
           <svg viewBox="0 0 24 24" width="22" height="22"><path fill="#fff" d="M24 12.07C24 5.41 18.63 0 12 0S0 5.41 0 12.07C0 18.05 4.39 23.1 10.13 24v-8.41H7.08v-3.49h3.05V9.41c0-3.01 1.79-4.67 4.54-4.67 1.32 0 2.7.24 2.7.24v2.97h-1.52c-1.5 0-1.97.93-1.97 1.88v2.26h3.35l-.54 3.49h-2.81V24C19.61 23.1 24 18.05 24 12.07z"/></svg>
-          Continue with Facebook
+          Connect with Facebook
         </button>
-        <p class="login-note" id="login-status">Enter your Meta App ID, then sign in.</p>
+        <p class="login-note" id="login-status">Click to connect your account.</p>
+        <p class="login-help hidden" id="login-help"></p>
       </div>
     </section>
 
@@ -203,6 +200,7 @@
 
   <div id="toast" class="toast hidden"></div>
 
+  <script src="/js/env.js"></script>
   <script src="js/config.js"></script>
   <script src="js/api.js"></script>
   <script src="js/auth.js"></script>

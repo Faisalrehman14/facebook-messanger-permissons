@@ -11,6 +11,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const VERIFY_TOKEN = process.env.VERIFY_TOKEN || 'pagechat_verify_token';
 const APP_SECRET = process.env.APP_SECRET || '';
+const FACEBOOK_APP_ID = process.env.FACEBOOK_APP_ID || '';
 
 const WEB_ROOT = path.join(__dirname, '..');
 
@@ -59,9 +60,17 @@ app.get('/health', (_, res) => {
     ok: true,
     app: 'PageChat Hub',
     webhook: '/webhook',
+    facebookAppIdSet: Boolean(FACEBOOK_APP_ID),
     verifyTokenSet: VERIFY_TOKEN !== 'pagechat_verify_token',
     appSecretSet: Boolean(APP_SECRET),
   });
+});
+
+// App ID for public users (no manual entry on login page)
+app.get('/js/env.js', (_, res) => {
+  res.type('application/javascript').send(
+    `window.__PAGECHAT__=${JSON.stringify({ appId: FACEBOOK_APP_ID })};`
+  );
 });
 
 // ─── Static app (frontend) ────────────────────────────────

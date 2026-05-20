@@ -1,5 +1,5 @@
 /**
- * PageChat Hub — Facebook Page Messenger Manager (production app)
+ * PageChat Hub — Facebook Page Messenger Manager
  */
 (function () {
   'use strict';
@@ -10,19 +10,55 @@
   document.addEventListener('DOMContentLoaded', init);
 
   async function init() {
-    Auth.loadAppId();
     bindUI();
     setReviewNotes();
+    await bootstrapAuth();
+  }
 
-    if (FB_CONFIG.appId) {
+  async function bootstrapAuth() {
+    setStatus('Loading…');
+    await loadEnvConfig();
+
+    if (!Auth.getAppId()) {
+      setStatus('App configuration missing. Contact the website owner.', true);
+      showHelp(
+        'Owner: add FACEBOOK_APP_ID in Railway Variables, then redeploy. Until App Review is approved, only Test Users can log in (Meta → App Roles).'
+      );
+      return;
+    }
+
+    try {
       await Auth.initSDK();
+      setStatus('Ready — click Connect with Facebook.');
       const session = await Auth.checkSession();
       if (session) await enterApp();
+    } catch (e) {
+      setStatus(e.message, true);
+    }
+  }
+
+  /** Reload env.js (Railway injects App ID) then merge into FB_CONFIG */
+  async function loadEnvConfig() {
+    try {
+      const res = await fetch('/js/env.js?t=' + Date.now());
+      if (res.ok) {
+        const code = await res.text();
+        if (code.includes('appId')) {
+          new Function(code)();
+          if (window.__PAGECHAT__?.appId) {
+            FB_CONFIG.appId = window.__PAGECHAT__.appId;
+          }
+        }
+      }
+    } catch {
+      /* static hosting — uses js/env.js stub or config.js */
+    }
+    if (!FB_CONFIG.appId && window.__PAGECHAT__?.appId) {
+      FB_CONFIG.appId = window.__PAGECHAT__.appId;
     }
   }
 
   function bindUI() {
-    document.getElementById('btn-save-app-id')?.addEventListener('click', onSaveAppId);
     document.getElementById('btn-login')?.addEventListener('click', onLogin);
     document.getElementById('btn-logout')?.addEventListener('click', onLogout);
     document.getElementById('page-select')?.addEventListener('change', onPageChange);
@@ -37,56 +73,61 @@
     });
   }
 
-  async function onSaveAppId() {
-    try {
-      const id = document.getElementById('app-id-input').value;
-      Auth.saveAppId(id);
-      await Auth.initSDK();
-      setStatus('App ID saved. You can sign in now.');
-      toast('App ID saved');
-    } catch (e) {
-      toast(e.message, true);
-    }
-  }
-
   async function onLogin() {
     try {
-      if (!FB_CONFIG.appId) {
-        toast('Enter your Facebook App ID first', true);
+      if (!Auth.getAppId()) {
+        toast('App not configured yet', true);
         return;
       }
       await Auth.initSDK();
-      setStatus('Opening Facebook login…');
+      setStatus('Opening Facebook…');
+      showHelp('');
       await Auth.login();
       await enterApp();
     } catch (e) {
-      setStatus(e.message, true);
+      setStatus('Could not sign in', true);
+      showHelp(e.message);
       toast(e.message, true);
     }
   }
 
   async function enterApp() {
-    const user = await Auth.fetchUser();
-    document.querySelector('.landing-main')?.classList.add('hidden');
-    document.querySelector('.landing-header')?.classList.add('hidden');
-    document.querySelector('.landing-footer')?.classList.add('hidden');
-    document.getElementById('app-shell').classList.remove('hidden');
+    try {
+      const user = await Auth.fetchUser();
+      document.querySelector('.landing-main')?.classList.add('hidden');
+      document.querySelector('.landing-header')?.classList.add('hidden');
+      document.querySelector('.landing-footer')?.classList.add('hidden');
+      document.getElementById('app-shell').classList.remove('hidden');
 
-    document.getElementById('sidebar-avatar').src = user.picture?.data?.url || '';
-    document.getElementById('sidebar-name').textContent = user.name;
+      document.getElementById('sidebar-avatar').src = user.picture?.data?.url || '';
+      document.getElementById('sidebar-name').textContent = user.name;
 
-    pages = await GraphAPI.getPages();
-    if (!pages.length) {
-      toast('No Pages found. Create a Page and connect it in Meta → Messenger.', true);
-      return;
+      pages = await GraphAPI.getPages();
+      if (!pages.length) {
+        toast(
+          'No Facebook Page found on this account. Create a Page or use an account that manages one.',
+          true
+        );
+        showHelp(
+          'You need a Facebook Page to use PageChat Hub. Go to facebook.com/pages/create, then sign in again.'
+        );
+        return;
+      }
+
+      const sel = document.getElementById('page-select');
+      sel.innerHTML = pages.map((p) => `<option value="${p.id}">${escape(p.name)}</option>`).join('');
+
+      const saved = localStorage.getItem(FB_CONFIG.storageKeys.activePageId);
+      if (saved && pages.find((p) => p.id === saved)) sel.value = saved;
+      await setActivePage(pages.find((p) => p.id === sel.value) || pages[0]);
+      toast('Welcome, ' + user.name);
+    } catch (e) {
+      toast(e.message, true);
+      showHelp(
+        e.message +
+          ' — If this is a new user, ensure the Meta app is Live or add them as Tester in App Roles.'
+      );
     }
-
-    const sel = document.getElementById('page-select');
-    sel.innerHTML = pages.map((p) => `<option value="${p.id}">${escape(p.name)}</option>`).join('');
-
-    const saved = localStorage.getItem(FB_CONFIG.storageKeys.activePageId);
-    if (saved && pages.find((p) => p.id === saved)) sel.value = saved;
-    await setActivePage(pages.find((p) => p.id === sel.value) || pages[0]);
   }
 
   async function setActivePage(page) {
@@ -170,21 +211,17 @@
 App URL: ${origin}/
 
 WHAT THIS APP DOES:
-PageChat Hub is a customer support tool for Facebook Page owners. Businesses use it to read Messenger inbox, reply to customers, view post engagement, and send order/account utility updates.
+PageChat Hub is a customer support inbox for Facebook Page owners. Users sign in with Facebook, select their Page, read Messenger conversations, reply to customers, view engagement, and send utility updates.
 
 TEST STEPS:
-1. Log in with Facebook (test account must be App Admin/Developer).
-2. Select a Facebook Page from the sidebar dropdown (pages_show_list).
-3. INBOX: View real Messenger conversations (pages_messaging). Open a thread and send a reply.
-   - Prerequisite: Test user must have sent a message to the Page first.
-4. ENGAGEMENT: View Page posts with likes, comments, shares (pages_read_engagement).
-5. UTILITY MESSAGES: Select a customer from inbox list, choose message type, send shipping/order update (pages_utility_messaging).
-6. public_profile: Shown in sidebar after login (user name + photo).
+1. Click "Connect with Facebook" and log in.
+2. Select a Page from the dropdown.
+3. INBOX: Open a conversation and send a reply.
+4. ENGAGEMENT: View posts and metrics.
+5. UTILITY: Send an order/shipping update to a customer from the list.
 
-Test Facebook account: [YOUR TEST EMAIL]
-Test Page name: [YOUR PAGE NAME]
-
-Webhook server (optional): Deploy /server for real-time message delivery.`;
+Test account: [YOUR EMAIL]
+Test Page: [YOUR PAGE NAME]`;
   }
 
   function copyNotes() {
@@ -202,12 +239,23 @@ Webhook server (optional): Deploy /server for real-time message delivery.`;
     }
   }
 
+  function showHelp(msg) {
+    const el = document.getElementById('login-help');
+    if (!el) return;
+    if (msg) {
+      el.textContent = msg;
+      el.classList.remove('hidden');
+    } else {
+      el.classList.add('hidden');
+    }
+  }
+
   function toast(msg, err) {
     const t = document.getElementById('toast');
     t.textContent = msg;
     t.style.background = err ? '#e41e3f' : '#1c1e21';
     t.classList.remove('hidden');
-    setTimeout(() => t.classList.add('hidden'), 4000);
+    setTimeout(() => t.classList.add('hidden'), 4500);
   }
 
   function escape(s) {

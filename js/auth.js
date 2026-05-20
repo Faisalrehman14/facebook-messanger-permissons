@@ -4,32 +4,35 @@ const Auth = (function () {
   let ready = false;
   let user = null;
 
-  function loadAppId() {
-    const saved = localStorage.getItem(FB_CONFIG.storageKeys.appId);
-    if (saved) FB_CONFIG.appId = saved;
-    const input = document.getElementById('app-id-input');
-    if (input && FB_CONFIG.appId) input.value = FB_CONFIG.appId;
-  }
-
-  function saveAppId(id) {
-    FB_CONFIG.appId = id.trim();
-    if (!FB_CONFIG.appId) throw new Error('App ID required');
-    localStorage.setItem(FB_CONFIG.storageKeys.appId, FB_CONFIG.appId);
+  function getAppId() {
+    return FB_CONFIG.appId?.trim() || '';
   }
 
   function initSDK() {
-    if (!FB_CONFIG.appId || ready) return Promise.resolve();
+    const appId = getAppId();
+    if (!appId) {
+      return Promise.reject(
+        new Error(
+          'App is not configured yet. Owner must set FACEBOOK_APP_ID on Railway (or js/config.js).'
+        )
+      );
+    }
+    if (ready) return Promise.resolve();
 
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       window.fbAsyncInit = function () {
-        FB.init({
-          appId: FB_CONFIG.appId,
-          cookie: true,
-          xfbml: false,
-          version: FB_CONFIG.version,
-        });
-        ready = true;
-        resolve();
+        try {
+          FB.init({
+            appId,
+            cookie: true,
+            xfbml: false,
+            version: FB_CONFIG.version,
+          });
+          ready = true;
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
       };
 
       if (!document.getElementById('facebook-jssdk')) {
@@ -38,6 +41,7 @@ const Auth = (function () {
         s.src = 'https://connect.facebook.net/en_US/sdk.js';
         s.async = true;
         s.defer = true;
+        s.onerror = () => reject(new Error('Could not load Facebook SDK. Check your internet connection.'));
         document.body.appendChild(s);
       } else if (window.FB) {
         window.fbAsyncInit();
@@ -58,10 +62,27 @@ const Auth = (function () {
     return new Promise((resolve, reject) => {
       FB.login(
         (res) => {
-          if (res.authResponse) resolve(res.authResponse);
-          else reject(new Error('Login cancelled or permissions denied'));
+          if (res.authResponse) {
+            return resolve(res.authResponse);
+          }
+          if (res.status === 'not_authorized') {
+            return reject(
+              new Error(
+                'Permissions not granted. Please accept all permissions so we can load your Page inbox.'
+              )
+            );
+          }
+          reject(
+            new Error(
+              'Login cancelled. If you cannot log in, the app may still be in Development mode — ask the app owner to add you as a Tester, or wait until the app is Live.'
+            )
+          );
         },
-        { scope: FB_CONFIG.scopes, return_scopes: true }
+        {
+          scope: FB_CONFIG.scopes,
+          return_scopes: true,
+          auth_type: 'rerequest',
+        }
       );
     });
   }
@@ -87,8 +108,7 @@ const Auth = (function () {
   }
 
   return {
-    loadAppId,
-    saveAppId,
+    getAppId,
     initSDK,
     checkSession,
     login,
