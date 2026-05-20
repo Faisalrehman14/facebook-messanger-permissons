@@ -136,7 +136,7 @@
           scopes = (perms.data || []).filter((p) => p.status === 'granted').map((p) => p.permission).join(',');
         } catch { /* ignore */ }
       }
-      Readiness.onLogin(pages, scopes);
+      await Readiness.onLogin(pages, scopes);
       updateVideoScript();
       switchView('review');
       toast('Welcome! Open Submission Center — fix blockers before Meta submit.');

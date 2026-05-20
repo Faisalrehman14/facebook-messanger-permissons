@@ -103,7 +103,33 @@ const Readiness = (function () {
   }
 
   function missingScopes() {
-    return requiredScopes().filter((s) => !state.grantedScopes.includes(s));
+    const missing = requiredScopes().filter((s) => !state.grantedScopes.includes(s));
+    if (!state.loggedIn) return missing;
+    // public_profile is default with Facebook Login — name/photo visible = granted
+    if (missing.length === 1 && missing[0] === 'public_profile') return [];
+    if (state.hasPages && missing.includes('pages_show_list') && missing.length === 1) return [];
+    return missing;
+  }
+
+  async function refreshGrantedFromApi() {
+    try {
+      const perms = await GraphAPI.userGet('/me/permissions');
+      const granted = (perms.data || [])
+        .filter((p) => p.status === 'granted')
+        .map((p) => p.permission);
+      if (state.loggedIn) {
+        try {
+          await GraphAPI.getMe();
+          if (!granted.includes('public_profile')) granted.push('public_profile');
+        } catch { /* me failed */ }
+      }
+      if (state.hasPages && !granted.includes('pages_show_list')) {
+        granted.push('pages_show_list');
+      }
+      setScopes(granted.join(','));
+    } catch {
+      renderScopesPanel();
+    }
   }
 
   function getBlockers() {
@@ -178,10 +204,11 @@ const Readiness = (function () {
     return critical.length === 0 && getScore() >= 90;
   }
 
-  function onLogin(pagesList, scopesStr) {
+  async function onLogin(pagesList, scopesStr) {
     state.loggedIn = true;
     state.hasPages = pagesList.length > 0;
     setScopes(scopesStr);
+    await refreshGrantedFromApi();
     runTechnicalChecks();
     renderScopesPanel();
     render();
