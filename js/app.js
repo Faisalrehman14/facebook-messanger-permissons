@@ -72,6 +72,7 @@
     document.getElementById('btn-copy-script')?.addEventListener('click', copyVideoScript);
     document.getElementById('btn-copy-all-urls')?.addEventListener('click', copyAllUrls);
     document.getElementById('btn-start-review-guide')?.addEventListener('click', () => AppReview.openGuide(0));
+    document.getElementById('btn-run-meta-tests')?.addEventListener('click', onRunMetaTests);
 
     document.querySelectorAll('.nav-item').forEach((btn) => {
       btn.addEventListener('click', () => switchView(btn.dataset.view));
@@ -254,6 +255,20 @@
   function copyVideoScript() {
     navigator.clipboard?.writeText(Readiness.getVideoScript());
     toast('Video script copied');
+  }
+
+  async function onRunMetaTests() {
+    if (!activePage) {
+      toast('Log in and select a Page first', true);
+      return;
+    }
+    const btn = document.getElementById('btn-run-meta-tests');
+    if (btn) btn.disabled = true;
+    try {
+      await MetaTests.runAll(activePage, pages);
+    } finally {
+      if (btn) btn.disabled = false;
+    }
   }
 
   function copyAllUrls() {

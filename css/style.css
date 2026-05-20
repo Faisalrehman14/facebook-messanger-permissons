@@ -127,6 +127,18 @@ body {
 .meta-chk-grid { display: grid; gap: 10px; margin-bottom: 20px; }
 .meta-chk-grid label { font-size: .9rem; display: flex; align-items: center; gap: 8px; cursor: pointer; }
 
+.meta-test-run-box {
+  background: #e7f3ff; border: 2px solid var(--blue);
+  border-radius: 12px; padding: 16px; margin-bottom: 20px;
+}
+.meta-test-log {
+  margin-top: 12px; max-height: 200px; overflow-y: auto;
+  background: var(--card); padding: 12px; border-radius: 8px;
+  font-size: .85rem; line-height: 1.5;
+}
+.meta-test-log .ok { color: #2e7d32; }
+.meta-test-log .err { color: #c62828; }
+
 .empty-inbox-guide {
   padding: 20px; margin: 12px; background: #fff8e1;
   border: 2px solid #ffb300; border-radius: 12px; font-size: .9rem;
