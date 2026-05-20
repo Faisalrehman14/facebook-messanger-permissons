@@ -73,6 +73,7 @@
     document.getElementById('btn-copy-all-urls')?.addEventListener('click', copyAllUrls);
     document.getElementById('btn-start-review-guide')?.addEventListener('click', () => AppReview.openGuide(0));
     document.getElementById('btn-run-meta-tests')?.addEventListener('click', onRunMetaTests);
+    document.getElementById('btn-test-pages-list')?.addEventListener('click', () => MetaTests.runPagesShowListOnly());
 
     document.querySelectorAll('.nav-item').forEach((btn) => {
       btn.addEventListener('click', () => switchView(btn.dataset.view));

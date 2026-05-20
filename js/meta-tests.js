@@ -27,9 +27,10 @@ const MetaTests = (function () {
     }
 
     try {
-      await GraphAPI.getPages();
-      line('✓ pages_show_list — GET /me/accounts', true);
+      const pagesRes = await testPagesShowList();
+      line(`✓ pages_show_list — GET /me/accounts (${pagesRes.count} page(s))`, true);
       AppReview.markPermissionUsed('pages_show_list');
+      Readiness.markDemo('pages_show_list');
     } catch (e) {
       line('✗ pages_show_list — ' + e.message, false);
     }
@@ -86,5 +87,38 @@ const MetaTests = (function () {
     return results;
   }
 
-  return { runAll };
+  /** Dedicated test — Meta counts user-token /me/accounts for pages_show_list */
+  function testPagesShowList() {
+    return new Promise((resolve, reject) => {
+      FB.api('/me/accounts?fields=id,name&limit=50', (res) => {
+        if (res && !res.error) {
+          const count = (res.data || []).length;
+          resolve({ count, data: res.data });
+        } else {
+          reject(new Error(res?.error?.message || 'GET /me/accounts failed'));
+        }
+      });
+    });
+  }
+
+  async function runPagesShowListOnly() {
+    const log = document.getElementById('meta-test-log');
+    if (log) log.innerHTML = '';
+    try {
+      const r = await testPagesShowList();
+      if (log) {
+        log.innerHTML = `<div class="ok">✓ pages_show_list OK — ${r.count} Page(s) returned.</div>
+          <div class="ok">Meta may take 5–30 min to turn green. Refresh App Review → Testing.</div>`;
+      }
+      AppReview.markPermissionUsed('pages_show_list');
+      if (typeof toast === 'function') toast(`${r.count} page(s) loaded`);
+      return r;
+    } catch (e) {
+      if (log) log.innerHTML = `<div class="err">✗ ${e.message}</div>`;
+      if (typeof toast === 'function') toast(e.message, true);
+      throw e;
+    }
+  }
+
+  return { runAll, runPagesShowListOnly, testPagesShowList };
 })();

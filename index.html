@@ -237,7 +237,12 @@
           <h3 class="subsection-title">Make Meta Testing green</h3>
           <p class="perm-use-line">Click below while logged in. Then refresh Meta → App Review → Testing (wait 5–30 min).</p>
           <button type="button" id="btn-run-meta-tests" class="btn-primary">Run all API tests for Meta</button>
+          <button type="button" id="btn-test-pages-list" class="btn-outline-sm">Test pages_show_list only</button>
           <div id="meta-test-log" class="meta-test-log"></div>
+          <p class="meta-muted" style="margin-top:10px">
+            <strong>pages_show_list grey?</strong> High call count ≠ Completed. Logout → login → click
+            <em>Test pages_show_list only</em> → wait 30 min → refresh Meta Testing. Keep only Messenger use case.
+          </p>
         </div>
 
         <h3 class="subsection-title">Meta dashboard checklist (tick when done)</h3>
