@@ -3,259 +3,212 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FB Messenger Demo — App Review</title>
+  <title>PageChat Hub — Facebook Page Messenger Manager</title>
   <link rel="stylesheet" href="css/style.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 </head>
-<body>
-  <header class="top-bar">
-    <div class="logo">
-      <svg viewBox="0 0 36 36" width="32" height="32"><path fill="#0084FF" d="M18 2C9.2 2 2 8.6 2 17.1c0 4.7 2.2 8.9 5.6 11.7L5 34l6.2-3.2c1.8.5 3.7.8 5.7.8 8.8 0 16-6.6 16-15.1S26.8 2 18 2z"/><path fill="#fff" d="M12.5 20.3l-3.8-4 7.5-4.5 3.8 4-7.5 4.5zm11 0l-7.5-4.5 3.8-4 7.5 4.5-3.8 4.5z"/></svg>
-      <span>Messenger Demo</span>
+<body class="landing">
+  <header class="landing-header">
+    <div class="brand">
+      <svg viewBox="0 0 36 36" width="36" height="36"><circle cx="18" cy="18" r="18" fill="#0084FF"/><path fill="#fff" d="M10 18.5c0-4.4 3.6-8 8-8s8 3.6 8 8-3.6 8-8 8c-1.5 0-2.9-.4-4.1-1.1L10 26l.9-3.6A7.9 7.9 0 0110 18.5z"/></svg>
+      <span>PageChat Hub</span>
     </div>
-    <nav>
-      <a href="#setup">Setup</a>
-      <a href="#permissions">Permissions</a>
-      <a href="#review">App Review</a>
-      <a href="privacy.html">Privacy</a>
-    </nav>
-    <div id="user-pill" class="user-pill hidden">
-      <img id="user-avatar" alt="" />
-      <span id="user-name"></span>
-      <button id="btn-logout" class="btn-ghost">Logout</button>
-    </div>
+    <a href="privacy.html" class="link-muted">Privacy</a>
   </header>
 
-  <main>
-    <!-- Hero -->
-    <section class="hero" id="hero">
-      <div class="hero-content">
-        <span class="badge">Meta App Review Demo</span>
-        <h1>Get All 5 Permissions Approved</h1>
-        <p class="subtitle">
-          Yeh demo website Meta App Review ke liye banayi gayi hai.
-          Har permission ka <strong>real use case</strong> live dikhata hai —
-          reviewers ko test karne mein asaani hogi.
-        </p>
-        <ul class="perm-chips">
-          <li><code>public_profile</code></li>
-          <li><code>pages_show_list</code></li>
-          <li><code>pages_messaging</code></li>
-          <li><code>pages_utility_messaging</code></li>
-          <li><code>pages_read_engagement</code></li>
-        </ul>
-        <div class="hero-actions">
-          <button id="btn-login" class="btn-primary btn-fb">
-            <svg viewBox="0 0 24 24" width="20" height="20"><path fill="#fff" d="M24 12.07C24 5.41 18.63 0 12 0S0 5.41 0 12.07C0 18.05 4.39 23.1 10.13 24v-8.41H7.08v-3.49h3.05V9.41c0-3.01 1.79-4.67 4.54-4.67 1.32 0 2.7.24 2.7.24v2.97h-1.52c-1.5 0-1.97.93-1.97 1.88v2.26h3.35l-.54 3.49h-2.81V24C19.61 23.1 24 18.05 24 12.07z"/></svg>
-            Connect with Facebook
-          </button>
-          <a href="#setup" class="btn-secondary">Setup Guide</a>
+  <main class="landing-main">
+    <section class="landing-hero">
+      <h1>Manage your Facebook Page messages in one place</h1>
+      <p class="lead">
+        PageChat Hub is a customer messaging platform for Facebook Pages.
+        Read conversations, reply to customers, track post engagement, and send order updates — all from one dashboard.
+      </p>
+      <ul class="features-list">
+        <li>Unified inbox for all your Pages</li>
+        <li>Reply to Messenger customers in real time</li>
+        <li>Post engagement &amp; analytics</li>
+        <li>Order &amp; account utility notifications</li>
+      </ul>
+
+      <div class="login-card" id="login-card">
+        <h2>Sign in with Facebook</h2>
+        <p>Connect the Facebook account that manages your Page.</p>
+        <div class="app-id-row">
+          <input type="text" id="app-id-input" placeholder="Facebook App ID" />
+          <button type="button" id="btn-save-app-id" class="btn-outline">Save</button>
         </div>
-        <p class="hint" id="config-warning">⚠️ Pehle <code>js/config.js</code> mein apna App ID daalen.</p>
-      </div>
-      <div class="hero-card">
-        <h3>App Review Checklist</h3>
-        <ol class="checklist" id="checklist">
-          <li data-check="config">App ID configured</li>
-          <li data-check="login">Facebook Login works</li>
-          <li data-check="profile">public_profile demo</li>
-          <li data-check="pages">pages_show_list demo</li>
-          <li data-check="engagement">pages_read_engagement demo</li>
-          <li data-check="messaging">pages_messaging demo</li>
-          <li data-check="utility">pages_utility_messaging demo</li>
-          <li data-check="privacy">Privacy Policy URL added</li>
-        </ol>
+        <button type="button" id="btn-login" class="btn-fb-large">
+          <svg viewBox="0 0 24 24" width="22" height="22"><path fill="#fff" d="M24 12.07C24 5.41 18.63 0 12 0S0 5.41 0 12.07C0 18.05 4.39 23.1 10.13 24v-8.41H7.08v-3.49h3.05V9.41c0-3.01 1.79-4.67 4.54-4.67 1.32 0 2.7.24 2.7.24v2.97h-1.52c-1.5 0-1.97.93-1.97 1.88v2.26h3.35l-.54 3.49h-2.81V24C19.61 23.1 24 18.05 24 12.07z"/></svg>
+          Continue with Facebook
+        </button>
+        <p class="login-note" id="login-status">Enter your Meta App ID, then sign in.</p>
       </div>
     </section>
 
-    <!-- Setup -->
-    <section class="section" id="setup">
-      <h2>⚙️ Meta Developer Setup (5 Steps)</h2>
-      <div class="steps-grid">
-        <div class="step-card">
-          <span class="step-num">1</span>
-          <h3>Create App</h3>
-          <p><a href="https://developers.facebook.com/apps/" target="_blank">developers.facebook.com</a> → Create App → Type: <strong>Business</strong></p>
-        </div>
-        <div class="step-card">
-          <span class="step-num">2</span>
-          <h3>Add Products</h3>
-          <p>Add <strong>Facebook Login</strong> + <strong>Messenger</strong> products to your app.</p>
-        </div>
-        <div class="step-card">
-          <span class="step-num">3</span>
-          <h3>Configure Login</h3>
-          <p>Valid OAuth Redirect: <code id="redirect-uri"></code><br/>
-          Add your domain in App Domains + Site URL.</p>
-        </div>
-        <div class="step-card">
-          <span class="step-num">4</span>
-          <h3>Add Testers</h3>
-          <p>Roles → Add yourself as Admin/Developer/Tester. Connect a Facebook Page to the app.</p>
-        </div>
-        <div class="step-card">
-          <span class="step-num">5</span>
-          <h3>Request Permissions</h3>
-          <p>App Review → Permissions → Add same 5 permissions → Submit with this demo URL + screencast.</p>
-        </div>
-      </div>
-      <div class="config-box">
-        <label>Your Facebook App ID:</label>
-        <input type="text" id="app-id-input" placeholder="e.g. 1234567890123456" />
-        <button id="btn-save-config" class="btn-primary">Save App ID</button>
-      </div>
-    </section>
-
-    <!-- Permission Demos (shown after login) -->
-    <section class="section hidden" id="dashboard">
-      <h2>📋 Live Permission Demos</h2>
-      <p class="section-desc">Har tab ek permission ka use case demonstrate karta hai — App Review mein yahi dikhayen.</p>
-
-      <div class="tabs">
-        <button class="tab active" data-tab="profile">public_profile</button>
-        <button class="tab" data-tab="pages">pages_show_list</button>
-        <button class="tab" data-tab="engagement">pages_read_engagement</button>
-        <button class="tab" data-tab="messaging">pages_messaging</button>
-        <button class="tab" data-tab="utility">pages_utility_messaging</button>
-      </div>
-
-      <!-- public_profile -->
-      <div class="tab-panel active" id="panel-profile">
-        <div class="panel-header">
-          <h3>public_profile</h3>
-          <span class="use-case">Use case: User login &amp; basic profile display</span>
-        </div>
-        <p class="panel-desc">App user ki public profile (name, photo) dikhati hai taake unhe identify kiya ja sake.</p>
-        <div id="profile-result" class="result-box">Login karein taake profile load ho.</div>
-        <button class="btn-primary" id="btn-demo-profile">Run Demo API Call</button>
-        <pre class="api-call" id="api-profile">GET /me?fields=id,name,picture</pre>
-      </div>
-
-      <!-- pages_show_list -->
-      <div class="tab-panel" id="panel-pages">
-        <div class="panel-header">
-          <h3>pages_show_list</h3>
-          <span class="use-case">Use case: Page selection for messaging</span>
-        </div>
-        <p class="panel-desc">User ko unki managed Facebook Pages ki list dikhati hai taake woh Page select kar sakein.</p>
-        <div id="pages-result" class="result-box">Loading...</div>
-        <button class="btn-primary" id="btn-demo-pages">Refresh Pages List</button>
-        <pre class="api-call">GET /me/accounts?fields=id,name,category,picture,access_token</pre>
-        <div class="page-select-row">
-          <label>Selected Page for other demos:</label>
-          <select id="page-select"><option value="">— Select a page —</option></select>
-        </div>
-      </div>
-
-      <!-- pages_read_engagement -->
-      <div class="tab-panel" id="panel-engagement">
-        <div class="panel-header">
-          <h3>pages_read_engagement</h3>
-          <span class="use-case">Use case: Read Page posts &amp; engagement metrics</span>
-        </div>
-        <p class="panel-desc">Page ki posts, likes aur comments read karta hai taake engagement analytics dikhaye.</p>
-        <div id="engagement-result" class="result-box">Pehle upar se Page select karein.</div>
-        <button class="btn-primary" id="btn-demo-engagement">Load Page Posts</button>
-        <pre class="api-call">GET /{page-id}/posts?fields=message,created_time,likes.summary(true),comments.summary(true)</pre>
-      </div>
-
-      <!-- pages_messaging -->
-      <div class="tab-panel" id="panel-messaging">
-        <div class="panel-header">
-          <h3>pages_messaging</h3>
-          <span class="use-case">Use case: Send &amp; receive Page messages</span>
-        </div>
-        <p class="panel-desc">Facebook Page se Messenger messages bhejna — customer support / chatbot ke liye.</p>
-        <div class="msg-form">
-          <label>Recipient PSID (Page-Scoped User ID):</label>
-          <input type="text" id="recipient-psid" placeholder="Test user ka PSID (App Roles se)" />
-          <label>Message:</label>
-          <textarea id="msg-text" rows="3" placeholder="Hello from Messenger Demo!"></textarea>
-          <button class="btn-primary" id="btn-send-msg">Send Message (pages_messaging)</button>
-        </div>
-        <div id="messaging-result" class="result-box"></div>
-        <pre class="api-call">POST /{page-id}/messages  { recipient: {id}, message: {text} }</pre>
-        <div class="info-box">
-          <strong>PSID kaise milega?</strong> Test user ko Page par message karein → Webhooks setup karein →
-          ya Graph API Explorer se <code>/{page-id}/conversations</code> check karein.
-        </div>
-      </div>
-
-      <!-- pages_utility_messaging -->
-      <div class="tab-panel" id="panel-utility">
-        <div class="panel-header">
-          <h3>pages_utility_messaging</h3>
-          <span class="use-case">Use case: Order updates, account alerts (utility messages)</span>
-        </div>
-        <p class="panel-desc">Transactional / utility messages — order status, appointment reminders, etc.</p>
-        <div class="msg-form">
-          <label>Recipient PSID:</label>
-          <input type="text" id="utility-psid" placeholder="Same PSID as above" />
-          <label>Utility Message Type:</label>
-          <select id="utility-type">
-            <option value="CONFIRMED_EVENT_UPDATE">CONFIRMED_EVENT_UPDATE</option>
-            <option value="POST_PURCHASE_UPDATE">POST_PURCHASE_UPDATE</option>
-            <option value="ACCOUNT_UPDATE">ACCOUNT_UPDATE</option>
-          </select>
-          <label>Message Text:</label>
-          <textarea id="utility-text" rows="2" placeholder="Your order #1234 has shipped!"></textarea>
-          <button class="btn-primary" id="btn-send-utility">Send Utility Message</button>
-        </div>
-        <div id="utility-result" class="result-box"></div>
-        <pre class="api-call">POST /{page-id}/messages  messaging_type: UTILITY</pre>
-      </div>
-    </section>
-
-    <!-- App Review Guide -->
-    <section class="section" id="review">
-      <h2>✅ App Review Submission Guide</h2>
-      <div class="review-grid">
-        <div class="review-card">
-          <h3>🎬 Screencast (Required)</h3>
-          <p>2-5 minute video record karein jisme:</p>
-          <ol>
-            <li>Website open karein → Facebook Login</li>
-            <li>Har tab ka demo run karein (5 permissions)</li>
-            <li>Page select → posts load → message send</li>
-          </ol>
-        </div>
-        <div class="review-card">
-          <h3>📝 Test Instructions</h3>
-          <p>Meta ko yeh likhein:</p>
-          <textarea id="test-instructions" readonly rows="8"></textarea>
-          <button class="btn-secondary" id="btn-copy-instructions">Copy Instructions</button>
-        </div>
-        <div class="review-card">
-          <h3>🔗 URLs to Add in Meta</h3>
-          <ul class="url-list">
-            <li><strong>Privacy Policy:</strong> <span id="url-privacy"></span></li>
-            <li><strong>Terms:</strong> <span id="url-terms"></span></li>
-            <li><strong>App URL:</strong> <span id="url-app"></span></li>
-          </ul>
-        </div>
-        <div class="review-card">
-          <h3>⚠️ Common Rejection Reasons</h3>
-          <ul>
-            <li>Demo URL kaam nahi karti (localhost — use ngrok ya hosting)</li>
-            <li>Permission use case clear nahi</li>
-            <li>Privacy Policy missing</li>
-            <li>Test user / Page connected nahi</li>
-            <li>Screencast mein permission actually use nahi hoti</li>
-          </ul>
-        </div>
+    <section class="landing-perms">
+      <h3>How we use Facebook permissions</h3>
+      <div class="perm-grid">
+        <article>
+          <strong>public_profile</strong>
+          <p>Identify you when you sign in and show your name in the dashboard.</p>
+        </article>
+        <article>
+          <strong>pages_show_list</strong>
+          <p>List Pages you manage so you can pick which inbox to open.</p>
+        </article>
+        <article>
+          <strong>pages_messaging</strong>
+          <p>Read and reply to customer messages on your Page via Messenger.</p>
+        </article>
+        <article>
+          <strong>pages_read_engagement</strong>
+          <p>Show post performance — likes, comments, and reach on your Page.</p>
+        </article>
+        <article>
+          <strong>pages_utility_messaging</strong>
+          <p>Send order confirmations, shipping updates, and account alerts to customers who opted in.</p>
+        </article>
       </div>
     </section>
   </main>
 
-  <footer>
-    <p>FB Messenger Demo — For Meta App Review only. Not affiliated with Meta.</p>
-    <p><a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms of Service</a></p>
+  <footer class="landing-footer">
+    <p>&copy; PageChat Hub · <a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms</a></p>
   </footer>
+
+  <!-- Main app (hidden until login) -->
+  <div id="app-shell" class="app-shell hidden">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <svg viewBox="0 0 36 36" width="28" height="28"><circle cx="18" cy="18" r="18" fill="#0084FF"/></svg>
+        <span>PageChat Hub</span>
+      </div>
+
+      <div class="page-picker">
+        <label>Active Page</label>
+        <select id="page-select"></select>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button type="button" class="nav-item active" data-view="inbox">
+          <span class="nav-icon">💬</span> Inbox
+          <span class="badge-count hidden" id="unread-badge">0</span>
+        </button>
+        <button type="button" class="nav-item" data-view="engagement">
+          <span class="nav-icon">📊</span> Engagement
+        </button>
+        <button type="button" class="nav-item" data-view="utility">
+          <span class="nav-icon">📦</span> Utility Messages
+        </button>
+        <button type="button" class="nav-item" data-view="settings">
+          <span class="nav-icon">⚙️</span> Settings
+        </button>
+      </nav>
+
+      <div class="sidebar-user">
+        <img id="sidebar-avatar" alt="" />
+        <div>
+          <div id="sidebar-name" class="user-name"></div>
+          <button type="button" id="btn-logout" class="btn-text">Sign out</button>
+        </div>
+      </div>
+    </aside>
+
+    <main class="app-main">
+      <!-- INBOX -->
+      <section class="view active" id="view-inbox">
+        <header class="view-header">
+          <h1>Inbox</h1>
+          <button type="button" id="btn-refresh-inbox" class="btn-outline-sm">Refresh</button>
+        </header>
+        <div class="inbox-layout">
+          <div class="conv-list" id="conv-list">
+            <p class="empty-state">Select a Page to load conversations.</p>
+          </div>
+          <div class="chat-panel">
+            <div class="chat-header hidden" id="chat-header">
+              <img id="chat-avatar" alt="" />
+              <div>
+                <strong id="chat-name">Customer</strong>
+                <span id="chat-psid" class="muted"></span>
+              </div>
+            </div>
+            <div class="messages" id="messages"></div>
+            <form class="composer hidden" id="composer-form">
+              <input type="text" id="reply-input" placeholder="Type a reply…" autocomplete="off" />
+              <button type="submit" class="btn-send">Send</button>
+            </form>
+            <p class="empty-state chat-empty" id="chat-empty">Select a conversation to view messages.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ENGAGEMENT -->
+      <section class="view" id="view-engagement">
+        <header class="view-header">
+          <h1>Engagement</h1>
+          <button type="button" id="btn-refresh-posts" class="btn-outline-sm">Refresh</button>
+        </header>
+        <div class="stats-row" id="engagement-stats"></div>
+        <div class="posts-feed" id="posts-feed"></div>
+      </section>
+
+      <!-- UTILITY -->
+      <section class="view" id="view-utility">
+        <header class="view-header">
+          <h1>Utility Messages</h1>
+        </header>
+        <p class="view-desc">Send transactional updates (orders, appointments, account alerts) to customers who messaged your Page.</p>
+        <form class="utility-form" id="utility-form">
+          <label>Customer (from inbox)</label>
+          <select id="utility-recipient">
+            <option value="">— Select customer —</option>
+          </select>
+          <label>Message type</label>
+          <select id="utility-tag">
+            <option value="POST_PURCHASE_UPDATE">Order / shipping update</option>
+            <option value="CONFIRMED_EVENT_UPDATE">Appointment / event confirmation</option>
+            <option value="ACCOUNT_UPDATE">Account notification</option>
+          </select>
+          <label>Message</label>
+          <textarea id="utility-body" rows="4" placeholder="Your order #4521 has shipped and will arrive Friday."></textarea>
+          <button type="submit" class="btn-primary">Send utility message</button>
+        </form>
+        <div id="utility-status" class="status-msg hidden"></div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section class="view" id="view-settings">
+        <header class="view-header"><h1>Settings</h1></header>
+        <div class="settings-blocks">
+          <div class="settings-block">
+            <h3>Webhook (real-time messages)</h3>
+            <p>Deploy the included server so new customer messages appear instantly in Inbox.</p>
+            <pre class="code-block" id="webhook-url-display">Deploy server/ folder → set Callback URL in Meta</pre>
+            <ol class="setup-steps">
+              <li>Meta App → Messenger → Webhooks → Callback URL: <code id="webhook-callback"></code></li>
+              <li>Verify Token: set in <code>server/.env</code></li>
+              <li>Subscribe to: <code>messages</code>, <code>messaging_postbacks</code></li>
+            </ol>
+          </div>
+          <div class="settings-block">
+            <h3>App Review test notes</h3>
+            <textarea id="review-notes" readonly rows="10"></textarea>
+            <button type="button" id="btn-copy-notes" class="btn-outline-sm">Copy for Meta submission</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
 
   <div id="toast" class="toast hidden"></div>
 
   <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/inbox.js"></script>
+  <script src="js/engagement.js"></script>
+  <script src="js/utility.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

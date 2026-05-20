@@ -1,123 +1,100 @@
-# FB Messenger Demo — Meta App Review Website
+# PageChat Hub
 
-Yeh website aapki **5 Facebook permissions** ke liye App Review demo ke taur par kaam karti hai:
+**Real Facebook Page Messenger manager** — not a permission demo. Businesses use it to handle customer inbox, reply on Messenger, track post engagement, and send utility updates.
 
-| Permission | Demo |
+Built for **Meta App Review** with clear, production use cases for all 5 permissions.
+
+| Permission | Real feature in app |
 |---|---|
-| `public_profile` | User profile (name, photo) |
-| `pages_show_list` | Managed Pages list |
-| `pages_read_engagement` | Page posts + likes/comments |
-| `pages_messaging` | Send Page Messenger message |
-| `pages_utility_messaging` | Send utility/tag message |
+| `public_profile` | Sign-in & user identity in sidebar |
+| `pages_show_list` | Page picker — switch between managed Pages |
+| `pages_messaging` | **Inbox** — read threads & reply to customers |
+| `pages_read_engagement` | **Engagement** — posts, likes, comments, shares |
+| `pages_utility_messaging` | **Utility Messages** — order/shipping/account alerts |
 
 ---
 
-## Quick Start (5 minute setup)
-
-### 1. Website chalayein
+## Run locally
 
 ```bash
-cd "fb messanger demo website"
+# Frontend
 python3 -m http.server 8080
+# → http://localhost:8080
+
+# Webhook server (optional, real-time messages)
+cd server && cp .env.example .env
+npm install && npm start
+# → http://localhost:3000/webhook
 ```
 
-Browser: `http://localhost:8080`
-
-> **Important:** Facebook Login localhost par kaam karta hai, lekin App Review ke liye **public HTTPS URL** chahiye (ngrok ya hosting use karein).
-
-### 2. Meta Developer App banayein
-
-1. [developers.facebook.com/apps](https://developers.facebook.com/apps/) → **Create App** → Type: **Business**
-2. Products add karein: **Facebook Login** + **Messenger**
-3. **Settings → Basic** se App ID copy karein
-4. Website par **Setup** section mein App ID paste karein
-
-### 3. Facebook Login configure karein
-
-**Facebook Login → Settings:**
-
-- Valid OAuth Redirect URIs: `http://localhost:8080/` (aur production URL)
-- **Settings → Basic → App Domains:** `localhost` (dev) ya apna domain
-
-**Messenger → Settings:**
-
-- Apni Facebook **Page** connect karein
-
-### 4. Permissions request karein
-
-**App Review → Permissions and Features** — screenshot wali 5 permissions add karein (jo aapne already ki hain).
-
-### 5. Test users add karein
-
-**App Roles → Roles:** Apna Facebook account Admin/Developer banayein.
+1. [Meta Developers](https://developers.facebook.com/apps/) → create **Business** app  
+2. Add **Facebook Login** + **Messenger**  
+3. Paste **App ID** on login screen  
+4. OAuth redirect: `http://localhost:8080/`  
+5. Connect your **Facebook Page** (Messenger settings)  
+6. Add your account as **Admin/Developer** in App Roles  
 
 ---
 
-## App Review Submit kaise karein
+## Meta App Review
 
-### Zaroori cheezein
+### What to tell Meta
 
-1. **Live demo URL** (HTTPS) — ngrok example:
-   ```bash
-   ngrok http 8080
-   ```
-2. **Privacy Policy URL** — `https://your-domain/privacy.html`
-3. **2-5 min screencast** — har permission ka demo
-4. **Test instructions** — website par "App Review" section se copy karein
+> PageChat Hub is a customer support inbox for Facebook Page owners. Users sign in, select their Page, read Messenger conversations, reply to customers, view post engagement metrics, and send transactional utility messages (order updates).
 
-### Screencast mein yeh dikhayen
+### Test flow for reviewers
 
-1. Login with Facebook (sari permissions allow)
-2. `public_profile` → profile dikhe
-3. `pages_show_list` → Pages list load ho
-4. `pages_read_engagement` → posts + engagement
-5. `pages_messaging` → test user ko message bhejein
-6. `pages_utility_messaging` → utility message bhejein
+1. Login with Facebook  
+2. Select Page → **Inbox** loads real conversations  
+3. Open thread → send reply (`pages_messaging`)  
+4. **Engagement** → see posts & metrics (`pages_read_engagement`)  
+5. **Utility Messages** → send order update (`pages_utility_messaging`)  
 
-### PSID (Recipient ID) kaise milega
+**Important:** A test user must message your Page on Messenger before inbox/reply works.
 
-Test user ko apni **Facebook Page** par Messenger se message karein. Phir:
+### URLs for submission
 
-- Graph API Explorer: `GET /{page-id}/conversations`
-- Ya Messenger Webhooks setup karein
-
----
-
-## Public hosting (App Review ke liye)
-
-Free options:
-- **GitHub Pages** — repo push karein
-- **Netlify / Vercel** — drag & drop folder
-- **ngrok** — temporary HTTPS tunnel for testing
-
-`privacy.html` aur `terms.html` mein apna **email** zaroor update karein before submission.
-
----
-
-## Files
-
-```
-├── index.html          # Main demo app
-├── privacy.html        # Privacy policy (Meta required)
-├── terms.html          # Terms of service
-├── css/style.css
-├── js/config.js        # App ID + scopes
-├── js/app.js           # Facebook SDK logic
-└── README.md
-```
-
----
-
-## Common errors
-
-| Error | Fix |
+| Item | URL |
 |---|---|
-| "App ID not configured" | Setup section mein App ID save karein |
-| "URL Blocked" | OAuth Redirect URI add karein |
-| No pages listed | Page create karein + Messenger se connect |
-| Message send fail | Test user ne Page ko pehle message kiya ho |
-| Permission denied | Development mode — App Role wala account use karein |
+| App | `https://faisalrehman14.github.io/facebook-messanger-permissons/` |
+| Privacy | `.../privacy.html` |
+| Terms | `.../terms.html` |
+
+Copy full test notes from **Settings** inside the app.
+
+### Webhook (recommended for approval)
+
+1. Deploy `server/` to Render/Railway/Fly.io  
+2. Meta → Messenger → Webhooks  
+3. Callback: `https://your-server.com/webhook`  
+4. Verify token = `VERIFY_TOKEN` in `.env`  
+5. Subscribe: `messages`, `messaging_postbacks`  
 
 ---
 
-**Note:** Permissions automatically approve nahi hoti — Meta **App Review** process se approve karti hai. Yeh website sirf demo + testing ke liye hai taake review easy ho.
+## Project structure
+
+```
+├── index.html          # Landing + full app UI
+├── css/style.css
+├── js/
+│   ├── config.js
+│   ├── api.js          # Graph API
+│   ├── auth.js
+│   ├── inbox.js        # Real Messenger inbox
+│   ├── engagement.js
+│   ├── utility.js
+│   └── app.js
+├── server/             # Webhook for live messages
+├── privacy.html
+└── terms.html
+```
+
+---
+
+## Deploy
+
+- **GitHub Pages:** already on `main` — enable Pages in repo settings  
+- **Webhook:** deploy `server/` separately (needs HTTPS)  
+
+Update email in `privacy.html` / `terms.html` before final App Review submit.
