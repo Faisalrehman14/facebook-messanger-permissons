@@ -11,7 +11,9 @@
 
   async function init() {
     AppReview.init();
+    Readiness.init();
     bindUI();
+    Readiness.runTechnicalChecks();
     await bootstrapAuth();
   }
 
@@ -31,7 +33,7 @@
       await Auth.initSDK();
       setStatus('Ready — click Connect with Facebook.');
       const session = await Auth.checkSession();
-      if (session) await enterApp();
+      if (session) await enterApp(session);
     } catch (e) {
       setStatus(e.message, true);
     }
@@ -67,6 +69,8 @@
     document.getElementById('composer-form')?.addEventListener('submit', onSendReply);
     document.getElementById('utility-form')?.addEventListener('submit', onSendUtility);
     document.getElementById('btn-copy-notes')?.addEventListener('click', copyNotes);
+    document.getElementById('btn-copy-script')?.addEventListener('click', copyVideoScript);
+    document.getElementById('btn-copy-all-urls')?.addEventListener('click', copyAllUrls);
     document.getElementById('btn-start-review-guide')?.addEventListener('click', () => AppReview.openGuide(0));
 
     document.querySelectorAll('.nav-item').forEach((btn) => {
@@ -83,8 +87,8 @@
       await Auth.initSDK();
       setStatus('Opening Facebook…');
       showHelp('');
-      await Auth.login();
-      await enterApp();
+      const auth = await Auth.login();
+      await enterApp(auth);
     } catch (e) {
       setStatus('Could not sign in', true);
       showHelp(e.message);
@@ -92,7 +96,7 @@
     }
   }
 
-  async function enterApp() {
+  async function enterApp(authResponse) {
     try {
       const user = await Auth.fetchUser();
       document.querySelector('.landing-main')?.classList.add('hidden');
@@ -123,7 +127,17 @@
       await setActivePage(pages.find((p) => p.id === sel.value) || pages[0]);
       AppReview.renderSettingsBlocks(window.location.origin);
       AppReview.onLoginComplete();
-      toast('Welcome, ' + user.name);
+      let scopes = authResponse?.grantedScopes || '';
+      if (!scopes) {
+        try {
+          const perms = await GraphAPI.userGet('/me/permissions');
+          scopes = (perms.data || []).filter((p) => p.status === 'granted').map((p) => p.permission).join(',');
+        } catch { /* ignore */ }
+      }
+      Readiness.onLogin(pages, scopes);
+      updateVideoScript();
+      switchView('review');
+      toast('Welcome! Open Submission Center — fix blockers before Meta submit.');
     } catch (e) {
       toast(e.message, true);
       showHelp(
@@ -169,6 +183,7 @@
       await Inbox.sendReply(activePage, input.value);
       input.value = '';
       AppReview.markPermissionUsed('pages_messaging');
+      Readiness.markDemo('pages_messaging');
       toast('Message sent');
     } catch (err) {
       toast(err.message, true);
@@ -187,6 +202,7 @@
     try {
       await Utility.send(activePage, psid, text, tag);
       AppReview.markPermissionUsed('pages_utility_messaging');
+      Readiness.markDemo('pages_utility_messaging');
       Utility.showStatus('Utility message sent successfully.', true);
       toast('Utility message sent');
     } catch (err) {
@@ -209,6 +225,10 @@
       setupSettingsUrls();
       refreshPageMeta();
     }
+    if (name === 'review') {
+      Readiness.render();
+      updateVideoScript();
+    }
   }
 
   function refreshPageMeta() {
@@ -220,6 +240,29 @@
 
   window.switchView = switchView;
   window.toast = toast;
+  window.refreshInbox = refreshInbox;
+
+  function updateVideoScript() {
+    const el = document.getElementById('video-script');
+    if (el) el.textContent = Readiness.getVideoScript();
+  }
+
+  function copyVideoScript() {
+    navigator.clipboard?.writeText(Readiness.getVideoScript());
+    toast('Video script copied');
+  }
+
+  function copyAllUrls() {
+    const o = location.origin;
+    const text = `App URL: ${o}/
+Privacy: ${o}/privacy.html
+Data deletion: ${o}/data-deletion.html
+Terms: ${o}/terms.html
+Deauthorize: ${o}/deauth.html
+Webhook: ${o}/webhook`;
+    navigator.clipboard?.writeText(text);
+    toast('All URLs copied');
+  }
 
   function setupSettingsUrls() {
     const origin = window.location.origin;

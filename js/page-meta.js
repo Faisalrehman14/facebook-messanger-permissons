@@ -57,6 +57,7 @@ const PageMeta = (function () {
     try {
       const sub = await getSubscription(page.id, page.access_token);
       renderStatus(statusEl, { subscribed: sub.subscribed });
+      if (typeof Readiness !== 'undefined') Readiness.setWebhook(sub.subscribed);
       if (actionsEl) {
         actionsEl.innerHTML = sub.subscribed
           ? `<button type="button" class="btn-outline-sm" id="btn-unsubscribe-page">Disconnect webhooks</button>`

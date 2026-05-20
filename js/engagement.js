@@ -27,9 +27,15 @@ const Engagement = (function () {
   function renderPosts(posts) {
     const feed = document.getElementById('posts-feed');
     if (!posts.length) {
-      feed.innerHTML = '<p class="empty-state">No posts on this Page yet. Create a post on Facebook to see engagement here.</p>';
+      feed.innerHTML = `
+        <div class="empty-inbox-guide">
+          <h4>⚠️ No posts on this Page</h4>
+          <p>Meta reviewers need to see engagement data. Create at least one post on Facebook, then Refresh.</p>
+        </div>`;
+      if (typeof Readiness !== 'undefined') Readiness.setPosts(false);
       return;
     }
+    if (typeof Readiness !== 'undefined') Readiness.setPosts(true);
 
     feed.innerHTML = posts
       .map((p) => {

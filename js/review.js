@@ -168,6 +168,7 @@ const AppReview = (function () {
       pages_manage_metadata: 'check-metadata',
     };
     if (map[perm]) markCheck(map[perm]);
+    if (typeof Readiness !== 'undefined') Readiness.markDemo(perm);
   }
 
   function markCheck(id) {

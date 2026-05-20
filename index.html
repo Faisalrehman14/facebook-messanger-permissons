@@ -105,7 +105,7 @@
           <span class="nav-icon">📦</span> Utility Messages
         </button>
         <button type="button" class="nav-item" data-view="review">
-          <span class="nav-icon">✅</span> App Review
+          <span class="nav-icon">✅</span> Submit Center
         </button>
         <button type="button" class="nav-item" data-view="settings">
           <span class="nav-icon">⚙️</span> Settings
@@ -199,10 +199,54 @@
       <!-- APP REVIEW -->
       <section class="view" id="view-review">
         <header class="view-header">
-          <h1>App Review Checklist</h1>
+          <h1>Submission Center</h1>
           <button type="button" id="btn-start-review-guide" class="btn-primary">Start walkthrough</button>
         </header>
-        <p class="perm-use-line">Complete each step, then submit in Meta Developer portal. Green ✓ = ready for screencast.</p>
+
+        <div class="readiness-panel">
+          <div class="readiness-head">
+            <div>
+              <span class="readiness-label">Approval readiness</span>
+              <div id="readiness-score" class="readiness-score bad">0%</div>
+            </div>
+            <div id="submit-verdict" class="submit-verdict not-ready">
+              <strong>⛔ Not ready</strong><p>Fix blockers below before submitting to Meta.</p>
+            </div>
+          </div>
+          <h3 class="subsection-title">Blockers (fix all before submit)</h3>
+          <ul class="blocker-list" id="readiness-blockers"></ul>
+        </div>
+
+        <div class="test-creds-box">
+          <h3 class="subsection-title">Test credentials for Meta (required)</h3>
+          <div class="creds-row">
+            <label>Test email</label>
+            <input type="email" id="test-email" placeholder="faisalboss788@gmail.com" />
+          </div>
+          <div class="creds-row">
+            <label>Test password</label>
+            <input type="password" id="test-password" placeholder="Password for reviewer" />
+          </div>
+          <div class="creds-row">
+            <label>Test Page name</label>
+            <input type="text" id="test-page-name" placeholder="Your Facebook Page name" />
+          </div>
+        </div>
+
+        <h3 class="subsection-title">Meta dashboard checklist (tick when done)</h3>
+        <div class="meta-chk-grid">
+          <label><input type="checkbox" id="meta-chk-privacy" /> Privacy Policy URL added in Meta Basic</label>
+          <label><input type="checkbox" id="meta-chk-deletion" /> Data deletion URL added in Meta Basic</label>
+          <label><input type="checkbox" id="meta-chk-oauth" /> OAuth redirect URL matches this site</label>
+          <label><input type="checkbox" id="meta-chk-tester" /> Test user added in App Roles</label>
+          <label><input type="checkbox" id="meta-chk-screencast" /> Screencast recorded (all 6 permissions)</label>
+        </div>
+
+        <h3 class="subsection-title">Video script</h3>
+        <pre class="code-block" id="video-script" style="max-height:160px;overflow:auto"></pre>
+        <button type="button" id="btn-copy-script" class="btn-outline-sm">Copy video script</button>
+
+        <p class="perm-use-line">Complete each app step, then submit in Meta Developer portal.</p>
         <ul class="review-checklist" id="review-checklist">
           <li id="check-profile"><span class="check-icon">○</span> <code>public_profile</code> — User name visible in sidebar</li>
           <li id="check-pages"><span class="check-icon">○</span> <code>pages_show_list</code> — Page dropdown loaded</li>
@@ -218,6 +262,7 @@
         <h3 class="subsection-title">Test instructions</h3>
         <textarea id="review-notes" readonly rows="12"></textarea>
         <button type="button" id="btn-copy-notes" class="btn-outline-sm">Copy test instructions</button>
+        <button type="button" id="btn-copy-all-urls" class="btn-outline-sm">Copy all Meta URLs</button>
       </section>
 
       <!-- SETTINGS -->
@@ -262,6 +307,7 @@
   <script src="js/utility.js"></script>
   <script src="js/page-meta.js"></script>
   <script src="js/review.js"></script>
+  <script src="js/readiness.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

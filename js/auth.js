@@ -63,6 +63,7 @@ const Auth = (function () {
       FB.login(
         (res) => {
           if (res.authResponse) {
+            res.authResponse.grantedScopes = res.authResponse.grantedScopes || '';
             return resolve(res.authResponse);
           }
           if (res.status === 'not_authorized') {

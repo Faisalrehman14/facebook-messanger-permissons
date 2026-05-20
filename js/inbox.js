@@ -6,12 +6,36 @@ const Inbox = (function () {
   let activeCustomer = null;
   let pollTimer = null;
 
-  function renderList(convs, pageId, onSelect) {
+  function emptyInboxHtml(pageName) {
+    const page = pageName || 'your Page';
+    return `
+      <div class="empty-inbox-guide">
+        <h4>⚠️ Required before Meta App Review</h4>
+        <p>Reviewers must see real messages. Empty inbox = <strong>rejection</strong>.</p>
+        <ol>
+          <li>Open <strong>Messenger</strong> on phone/desktop</li>
+          <li>Log in as a <strong>test user</strong> (not the Page itself)</li>
+          <li>Search your Page: <strong>${escape(page)}</strong></li>
+          <li>Send message: <em>"Hello, I need help with my order"</em></li>
+          <li>Come back here → click <strong>Refresh</strong></li>
+        </ol>
+        <button type="button" class="btn-outline-sm" id="btn-refresh-inbox-empty">Refresh inbox</button>
+      </div>`;
+  }
+
+  function renderList(convs, pageId, pageName, onSelect) {
     const el = document.getElementById('conv-list');
     if (!convs.length) {
-      el.innerHTML = '<p class="empty-state">No conversations yet. Ask a test user to message your Page on Messenger.</p>';
+      el.innerHTML = emptyInboxHtml(pageName);
+      document.getElementById('btn-refresh-inbox-empty')?.addEventListener('click', () => {
+        if (typeof refreshInbox === 'function') refreshInbox();
+        else document.getElementById('btn-refresh-inbox')?.click();
+      });
+      if (typeof Readiness !== 'undefined') Readiness.setConversations(false);
       return;
     }
+
+    if (typeof Readiness !== 'undefined') Readiness.setConversations(true);
 
     el.innerHTML = convs
       .map((c) => {
@@ -58,8 +82,6 @@ const Inbox = (function () {
     document.getElementById('chat-empty').classList.add('hidden');
     document.getElementById('chat-name').textContent = customer?.name || 'Customer';
     document.getElementById('chat-psid').textContent = psid ? `ID: ${psid}` : '';
-    document.getElementById('chat-avatar').src = '';
-    document.getElementById('chat-avatar').alt = customer?.name || '';
   }
 
   async function load(page, onCustomerList) {
@@ -69,7 +91,7 @@ const Inbox = (function () {
       totalUnread += c.unread_count || 0;
     });
     updateUnreadBadge(totalUnread);
-    renderList(conversations, page.id, (conv, psid) => selectConversation(page, conv, psid));
+    renderList(conversations, page.id, page.name, (conv, psid) => selectConversation(page, conv, psid));
     populateUtilityRecipients(conversations, page.id, onCustomerList);
 
     const savedConv = localStorage.getItem(FB_CONFIG.storageKeys.activeConvId);
@@ -123,7 +145,6 @@ const Inbox = (function () {
       const opt = document.createElement('option');
       opt.value = cust.id;
       opt.textContent = cust.name || cust.email || cust.id;
-      opt.dataset.name = cust.name || '';
       sel.appendChild(opt);
     });
     if (prev) sel.value = prev;

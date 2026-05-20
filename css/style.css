@@ -95,6 +95,46 @@ body {
 .meta-muted { font-size: .85rem; color: var(--muted); margin-top: 6px; }
 .webhook-actions { margin-bottom: 12px; }
 
+.readiness-panel {
+  background: var(--card); border: 2px solid var(--border);
+  border-radius: 12px; padding: 20px; margin-bottom: 24px;
+}
+.readiness-head { display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start; margin-bottom: 16px; }
+.readiness-label { font-size: .8rem; color: var(--muted); font-weight: 600; text-transform: uppercase; }
+.readiness-score { font-size: 2.5rem; font-weight: 800; line-height: 1; }
+.readiness-score.good { color: #31a24c; }
+.readiness-score.mid { color: #f57c00; }
+.readiness-score.bad { color: #e41e3f; }
+.submit-verdict { flex: 1; min-width: 200px; padding: 14px; border-radius: 8px; font-size: .9rem; }
+.submit-verdict.ready { background: #e8f5e9; border: 1px solid #81c784; }
+.submit-verdict.not-ready { background: #ffebee; border: 1px solid #ef9a9a; }
+.submit-verdict p { margin-top: 6px; color: var(--muted); }
+
+.blocker-list { list-style: none; margin: 0; }
+.blocker-list .blocker { padding: 10px 12px; margin-bottom: 6px; border-radius: 8px; font-size: .88rem; }
+.blocker-list .critical { background: #ffebee; color: #b71c1c; }
+.blocker-list .warn { background: #fff8e1; color: #5d4037; }
+.blocker-list .ok { background: #e8f5e9; color: #2e7d32; }
+
+.test-creds-box {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 16px; margin-bottom: 20px;
+}
+.creds-row { display: grid; gap: 4px; margin-bottom: 12px; }
+.creds-row label { font-size: .85rem; font-weight: 600; }
+.creds-row input { padding: 10px; border: 1px solid var(--border); border-radius: 8px; }
+
+.meta-chk-grid { display: grid; gap: 10px; margin-bottom: 20px; }
+.meta-chk-grid label { font-size: .9rem; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+
+.empty-inbox-guide {
+  padding: 20px; margin: 12px; background: #fff8e1;
+  border: 2px solid #ffb300; border-radius: 12px; font-size: .9rem;
+}
+.empty-inbox-guide h4 { margin-bottom: 8px; color: #e65100; }
+.empty-inbox-guide ol { margin: 12px 0 12px 20px; }
+.empty-inbox-guide li { margin-bottom: 6px; }
+
 .landing-main { max-width: 960px; margin: 0 auto; padding: 48px 24px 80px; }
 .landing-hero h1 { font-size: 2.4rem; line-height: 1.15; margin-bottom: 16px; max-width: 640px; }
 .lead { color: var(--muted); font-size: 1.1rem; max-width: 560px; margin-bottom: 24px; }
