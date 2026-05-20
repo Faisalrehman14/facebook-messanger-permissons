@@ -160,9 +160,7 @@
 
   function setReviewNotes() {
     const origin = window.location.origin;
-    const webhook = origin.includes('localhost')
-      ? 'https://YOUR-SERVER.com/webhook'
-      : origin.replace(/:\d+$/, '') + ':3000/webhook';
+    const webhook = `${origin}/webhook`;
 
     document.getElementById('webhook-callback').textContent = webhook;
     document.getElementById('webhook-url-display').textContent = webhook;

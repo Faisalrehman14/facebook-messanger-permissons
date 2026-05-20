@@ -1,34 +1,38 @@
 /**
- * PageChat Hub — Messenger Webhook Server
- * Receives real-time messages from Meta and logs them (extend to DB/push later).
+ * PageChat Hub — Production server (Railway / Render)
+ * Serves the web app + Messenger webhook on one HTTPS URL.
  */
 require('dotenv').config();
 const express = require('express');
 const crypto = require('crypto');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const VERIFY_TOKEN = process.env.VERIFY_TOKEN || 'pagechat_verify_token';
 const APP_SECRET = process.env.APP_SECRET || '';
 
+const WEB_ROOT = path.join(__dirname, '..');
+
 app.use(express.json());
 
-// Meta webhook verification (GET)
+// ─── Meta Webhook ─────────────────────────────────────────
 app.get('/webhook', (req, res) => {
   const mode = req.query['hub.mode'];
   const token = req.query['hub.verify_token'];
   const challenge = req.query['hub.challenge'];
 
   if (mode === 'subscribe' && token === VERIFY_TOKEN) {
-    console.log('Webhook verified');
+    console.log('[Webhook] Verified successfully');
     return res.status(200).send(challenge);
   }
+  console.warn('[Webhook] Verification failed — check VERIFY_TOKEN');
   return res.sendStatus(403);
 });
 
-// Incoming messages (POST)
 app.post('/webhook', (req, res) => {
   if (APP_SECRET && !verifySignature(req)) {
+    console.warn('[Webhook] Invalid signature');
     return res.sendStatus(403);
   }
 
@@ -41,11 +45,7 @@ app.post('/webhook', (req, res) => {
             pageId: entry.id,
             sender: event.sender?.id,
             text: event.message.text,
-            mid: event.message.mid,
           });
-        }
-        if (event.postback) {
-          console.log('[Postback]', event.postback);
         }
       });
     });
@@ -54,7 +54,25 @@ app.post('/webhook', (req, res) => {
   res.sendStatus(200);
 });
 
-app.get('/health', (_, res) => res.json({ ok: true, app: 'PageChat Hub Webhook' }));
+app.get('/health', (_, res) => {
+  res.json({
+    ok: true,
+    app: 'PageChat Hub',
+    webhook: '/webhook',
+    verifyTokenSet: VERIFY_TOKEN !== 'pagechat_verify_token',
+    appSecretSet: Boolean(APP_SECRET),
+  });
+});
+
+// ─── Static app (frontend) ────────────────────────────────
+app.use(express.static(WEB_ROOT));
+
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/webhook') || req.path === '/health') return next();
+  const file = path.join(WEB_ROOT, req.path);
+  if (req.path.includes('.')) return res.status(404).send('Not found');
+  res.sendFile(path.join(WEB_ROOT, 'index.html'));
+});
 
 function verifySignature(req) {
   const sig = req.get('X-Hub-Signature-256');
@@ -70,6 +88,7 @@ function verifySignature(req) {
 }
 
 app.listen(PORT, () => {
-  console.log(`PageChat Hub webhook running on http://localhost:${PORT}/webhook`);
+  console.log(`PageChat Hub live on port ${PORT}`);
+  console.log(`Webhook URL: /webhook`);
   console.log(`Verify token: ${VERIFY_TOKEN}`);
 });
