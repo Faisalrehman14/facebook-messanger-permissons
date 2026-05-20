@@ -419,5 +419,7 @@ const Readiness = (function () {
     canSubmit,
     getVideoScript,
     getBlockers,
+    confirmMetaSetupDone,
+    verifyMetaUrls,
   };
 })();
