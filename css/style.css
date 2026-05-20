@@ -139,6 +139,11 @@ body {
 .meta-test-log .ok { color: #2e7d32; }
 .meta-test-log .err { color: #c62828; }
 
+.scopes-panel { margin-top: 12px; padding: 12px; border-radius: 8px; font-size: .88rem; }
+.scopes-ok { background: #e8f5e9; color: #2e7d32; padding: 10px; border-radius: 8px; }
+.scopes-warn { background: #ffebee; color: #b71c1c; }
+.scopes-warn ul { margin: 8px 0 8px 20px; }
+
 .empty-inbox-guide {
   padding: 20px; margin: 12px; background: #fff8e1;
   border: 2px solid #ffb300; border-radius: 12px; font-size: .9rem;

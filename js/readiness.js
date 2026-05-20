@@ -183,7 +183,25 @@ const Readiness = (function () {
     state.hasPages = pagesList.length > 0;
     setScopes(scopesStr);
     runTechnicalChecks();
+    renderScopesPanel();
     render();
+  }
+
+  function renderScopesPanel() {
+    const el = document.getElementById('granted-scopes-panel');
+    if (!el) return;
+    const required = FB_CONFIG.scopes.split(',');
+    const missing = missingScopes();
+    el.classList.remove('hidden');
+    if (!missing.length) {
+      el.innerHTML =
+        '<p class="scopes-ok">✓ All permissions granted on your login token. If Meta Testing is still grey, wait 30 min and refresh — call count ≠ Completed.</p>';
+      return;
+    }
+    el.innerHTML = `
+      <p class="scopes-warn"><strong>⚠️ Meta green nahi hoga</strong> — yeh permissions token par grant nahi:</p>
+      <ul>${missing.map((p) => `<li><code>${p}</code></li>`).join('')}</ul>
+      <p>Fix: Sign out → Connect with Facebook → <strong>Allow all</strong> on popup.</p>`;
   }
 
   function render() {
