@@ -2,9 +2,35 @@ const Engagement = (function () {
   'use strict';
 
   async function load(page) {
-    const posts = await GraphAPI.getPagePosts(page.id, page.access_token);
-    renderStats(posts);
-    renderPosts(posts);
+    try {
+      const posts = await GraphAPI.getPagePosts(page.id, page.access_token);
+      renderStats(posts);
+      renderPosts(posts);
+      return { ok: true };
+    } catch (e) {
+      showPermissionError(e.message);
+      return { ok: false, error: e.message };
+    }
+  }
+
+  function showPermissionError(msg) {
+    const feed = document.getElementById('posts-feed');
+    const stats = document.getElementById('engagement-stats');
+    if (stats) stats.innerHTML = '';
+    if (feed) {
+      feed.innerHTML = `
+        <div class="empty-inbox-guide">
+          <h4>⚠️ pages_read_engagement required</h4>
+          <p>${escape(msg)}</p>
+          <p><strong>Fix:</strong></p>
+          <ol>
+            <li>Meta App → App Review → add <code>pages_read_engagement</code></li>
+            <li>Sign out → Connect with Facebook again → <strong>Allow all</strong> permissions</li>
+            <li>Until approved: use account added as <strong>Tester</strong> in App Roles</li>
+          </ol>
+        </div>`;
+    }
+    if (typeof Readiness !== 'undefined') Readiness.setPosts(false);
   }
 
   function renderStats(posts) {

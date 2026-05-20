@@ -151,9 +151,13 @@
     activePage = page;
     localStorage.setItem(FB_CONFIG.storageKeys.activePageId, page.id);
     Inbox.stopPolling();
-    await Inbox.load(page);
-    await Engagement.load(page);
-    AppReview.markPermissionUsed('pages_read_engagement');
+    try {
+      await Inbox.load(page);
+    } catch (e) {
+      toast('Inbox: ' + e.message, true);
+    }
+    const eng = await Engagement.load(page);
+    if (eng?.ok) AppReview.markPermissionUsed('pages_read_engagement');
     Inbox.startPolling(page);
     refreshPageMeta();
   }

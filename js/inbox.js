@@ -85,7 +85,20 @@ const Inbox = (function () {
   }
 
   async function load(page, onCustomerList) {
-    conversations = await GraphAPI.getConversations(page.id, page.access_token);
+    let convs;
+    try {
+      convs = await GraphAPI.getConversations(page.id, page.access_token);
+    } catch (e) {
+      const el = document.getElementById('conv-list');
+      el.innerHTML = `
+        <div class="empty-inbox-guide">
+          <h4>⚠️ pages_messaging required</h4>
+          <p>${escape(e.message)}</p>
+          <p>Sign out → login again and allow <strong>pages_messaging</strong>. Add permission in Meta App Review if missing.</p>
+        </div>`;
+      throw e;
+    }
+    conversations = convs;
     let totalUnread = 0;
     conversations.forEach((c) => {
       totalUnread += c.unread_count || 0;
