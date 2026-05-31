@@ -262,6 +262,7 @@ body {
 
 .app-main { overflow: hidden; display: flex; flex-direction: column; background: var(--bg); }
 .view { display: none; flex: 1; flex-direction: column; overflow: hidden; padding: 20px 24px; }
+#view-review { overflow-y: auto; }
 .view.active { display: flex; }
 .view-header {
   display: flex; align-items: center; justify-content: space-between;
