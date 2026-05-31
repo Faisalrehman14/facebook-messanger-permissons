@@ -50,17 +50,17 @@ const AppReview = (function () {
   ];
 
   const PERMISSION_ANSWERS = {
-    public_profile: `PageChat Hub uses public_profile only to display the signed-in user's name and profile picture in the dashboard sidebar after Facebook Login, so Page managers can confirm they are using the correct account. We do not use this data for advertising or sharing with third parties.`,
+    public_profile: `PageChat Hub uses public_profile solely to display the authenticated user's name and profile picture in the bottom-left sidebar of the dashboard immediately after Facebook Login. This allows Page managers and customer support agents to visually confirm they are signed in with the correct Facebook account before accessing their Page inbox. The profile data is rendered client-side only and is never stored on our servers, shared with third parties, or used for advertising or analytics purposes.`,
 
-    pages_show_list: `PageChat Hub uses pages_show_list to display a dropdown of Facebook Pages the user manages. The user selects which Page inbox and engagement data to view. Without this permission, managers with multiple Pages cannot switch between them.`,
+    pages_show_list: `PageChat Hub uses pages_show_list to retrieve the list of Facebook Pages that the authenticated user manages, and displays them in an "Active Page" dropdown selector in the dashboard sidebar. This is the essential first step in our onboarding flow — the user must select which Page's inbox and engagement data they want to work with. Without this permission, users who manage multiple Pages cannot navigate between them, and the entire platform becomes non-functional since all subsequent features (inbox, engagement, messaging) are scoped to the selected Page. Page names and IDs are used only to populate this selector and are not stored or shared.`,
 
-    pages_messaging: `PageChat Hub uses pages_messaging to provide a unified Messenger inbox for Facebook Page customer support. Users read conversations between their Page and customers, view message history, and send replies from our Inbox screen. This is the core feature of our app for businesses responding to customer inquiries on Messenger.`,
+    pages_messaging: `PageChat Hub uses pages_messaging to power its core feature: a real-time Messenger inbox for Facebook Page customer support. After selecting a Page, the user can view all active Messenger conversations with customers, open individual threads to read the full message history, and send direct replies to customers from within the dashboard — all without switching to Facebook. This permission is essential for businesses that rely on Messenger as a primary customer service channel. Messages are fetched from Meta's API and rendered in the browser session only. We do not store message content on our servers, we never initiate unsolicited messages, and we only send replies to existing user-initiated conversations where the customer has already contacted the Page.`,
 
-    pages_read_engagement: `PageChat Hub uses pages_read_engagement to show Page owners how their posts perform. The Engagement screen displays recent posts with like counts, comment counts, and shares so businesses can understand customer interest and improve their content.`,
+    pages_read_engagement: `PageChat Hub uses pages_read_engagement to display post performance metrics for the selected Facebook Page in our Engagement screen. The dashboard fetches the Page's recent posts and shows each post's like count, comment count, and share count, along with aggregate totals at the top. This gives Page managers a quick overview of which content resonates with their audience and how active their community is. The data is displayed in read-only format for analytics purposes only. We do not modify posts, and this data is never used for advertising, retargeting, or shared with any third party.`,
 
-    pages_utility_messaging: `PageChat Hub uses pages_utility_messaging to let businesses send transactional messages customers expect, such as order confirmations, shipping updates, and appointment reminders. Users select a customer who has already messaged the Page, choose an approved message tag, and send a one-to-one utility update from the Utility Messages screen.`,
+    pages_utility_messaging: `PageChat Hub uses pages_utility_messaging to enable businesses to send one-to-one transactional notifications to customers who have already initiated contact with their Page on Messenger. In the Utility Messages screen, the user selects a customer from their existing inbox conversations, chooses an approved Meta message tag (Order/Shipping Update, Confirmed Event Update, or Account Update), composes a message such as an order confirmation or shipping alert, and sends it. All messages are strictly transactional in nature, sent only to customers who have previously messaged the Page, and comply fully with Meta's messaging tag policies. This feature is not used for marketing or promotional messaging.`,
 
-    pages_manage_metadata: `PageChat Hub uses pages_manage_metadata to subscribe the user's Facebook Page to Messenger webhooks for our app. In Settings, the user clicks "Subscribe Page to webhooks" so PageChat Hub receives real-time notifications when customers send new messages. This allows timely inbox updates without manual refresh and is required for reliable customer support delivery.`,
+    pages_manage_metadata: `PageChat Hub uses pages_manage_metadata to allow Page administrators to subscribe their Facebook Page to Messenger webhook events through our Settings screen. When the user clicks "Subscribe Page to webhooks," our platform registers the Page with Meta's webhook system to receive real-time push notifications for incoming messages, postbacks, and message echoes. This subscription enables our inbox to update in real time when new customer messages arrive, eliminating the need for manual page refreshes. The permission is used exclusively for webhook subscription management and no Page settings or metadata are modified for any other purpose.`,
   };
 
   let stepIndex = 0;
@@ -132,7 +132,7 @@ const AppReview = (function () {
     stepIndex++;
     if (stepIndex >= STEPS.length) {
       closeGuide();
-      if (typeof toast === 'function') toast('All 5 permissions demonstrated. Submit App Review in Meta Developer portal.');
+      if (typeof toast === 'function') toast('All 6 permissions demonstrated. Submit App Review in Meta Developer portal.');
       return;
     }
     renderStep();
