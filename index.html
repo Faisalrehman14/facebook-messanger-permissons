@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PageChat Hub — Facebook Page Messenger Manager</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body class="landing">
+  <header class="landing-header">
+    <div class="brand">
+      <svg viewBox="0 0 36 36" width="36" height="36"><circle cx="18" cy="18" r="18" fill="#0084FF"/><path fill="#fff" d="M10 18.5c0-4.4 3.6-8 8-8s8 3.6 8 8-3.6 8-8 8c-1.5 0-2.9-.4-4.1-1.1L10 26l.9-3.6A7.9 7.9 0 0110 18.5z"/></svg>
+      <span>PageChat Hub</span>
+    </div>
+    <nav class="landing-links">
+      <a href="privacy.html" class="link-muted">Privacy</a>
+      <a href="data-deletion.html" class="link-muted">Data Deletion</a>
+    </nav>
+  </header>
+
+  <main class="landing-main">
+    <section class="landing-hero">
+      <h1>Manage your Facebook Page messages in one place</h1>
+      <p class="lead">
+        PageChat Hub is a customer messaging platform for Facebook Pages.
+        Read conversations, reply to customers, track post engagement, and send order updates — all from one dashboard.
+      </p>
+      <ul class="features-list">
+        <li>Unified inbox for all your Pages</li>
+        <li>Reply to Messenger customers in real time</li>
+        <li>Post engagement &amp; analytics</li>
+        <li>Order &amp; account utility notifications</li>
+      </ul>
+
+      <div class="login-card" id="login-card">
+        <h2>Sign in with Facebook</h2>
+        <p>Use the Facebook account that manages your business Page. Anyone with Page access can sign in.</p>
+        <button type="button" id="btn-login" class="btn-fb-large">
+          <svg viewBox="0 0 24 24" width="22" height="22"><path fill="#fff" d="M24 12.07C24 5.41 18.63 0 12 0S0 5.41 0 12.07C0 18.05 4.39 23.1 10.13 24v-8.41H7.08v-3.49h3.05V9.41c0-3.01 1.79-4.67 4.54-4.67 1.32 0 2.7.24 2.7.24v2.97h-1.52c-1.5 0-1.97.93-1.97 1.88v2.26h3.35l-.54 3.49h-2.81V24C19.61 23.1 24 18.05 24 12.07z"/></svg>
+          Connect with Facebook
+        </button>
+        <p class="login-note" id="login-status">Click to connect your account.</p>
+        <p class="login-help hidden" id="login-help"></p>
+      </div>
+    </section>
+
+    <section class="landing-perms">
+      <h3>How we use Facebook permissions</h3>
+      <div class="perm-grid">
+        <article>
+          <strong>public_profile</strong>
+          <p>Identify you when you sign in and show your name in the dashboard.</p>
+        </article>
+        <article>
+          <strong>pages_show_list</strong>
+          <p>List Pages you manage so you can pick which inbox to open.</p>
+        </article>
+        <article>
+          <strong>pages_messaging</strong>
+          <p>Read and reply to customer messages on your Page via Messenger.</p>
+        </article>
+        <article>
+          <strong>pages_read_engagement</strong>
+          <p>Show post performance — likes, comments, and reach on your Page.</p>
+        </article>
+        <article>
+          <strong>pages_utility_messaging</strong>
+          <p>Send order confirmations, shipping updates, and account alerts to customers who opted in.</p>
+        </article>
+        <article>
+          <strong>pages_manage_metadata</strong>
+          <p>Subscribe your Page to real-time Messenger webhooks so new customer messages arrive instantly.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="landing-footer">
+    <p>&copy; PageChat Hub · <a href="privacy.html">Privacy</a> · <a href="data-deletion.html">Data Deletion</a> · <a href="terms.html">Terms</a></p>
+  </footer>
+
+  <!-- Main app (hidden until login) -->
+  <div id="app-shell" class="app-shell hidden">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <svg viewBox="0 0 36 36" width="28" height="28"><circle cx="18" cy="18" r="18" fill="#0084FF"/></svg>
+        <span>PageChat Hub</span>
+      </div>
+
+      <div class="page-picker">
+        <label>Active Page <span class="perm-badge-sm">pages_show_list</span></label>
+        <select id="page-select"></select>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button type="button" class="nav-item active" data-view="inbox">
+          <span class="nav-icon">💬</span> Inbox
+          <span class="badge-count hidden" id="unread-badge">0</span>
+        </button>
+        <button type="button" class="nav-item" data-view="engagement">
+          <span class="nav-icon">📊</span> Engagement
+        </button>
+        <button type="button" class="nav-item" data-view="utility">
+          <span class="nav-icon">📦</span> Utility Messages
+        </button>
+        <button type="button" class="nav-item" data-view="review">
+          <span class="nav-icon">✅</span> Submit Center
+        </button>
+        <button type="button" class="nav-item" data-view="settings">
+          <span class="nav-icon">⚙️</span> Settings
+        </button>
+      </nav>
+
+      <div class="sidebar-user" title="public_profile">
+        <img id="sidebar-avatar" alt="" />
+        <div>
+          <div id="sidebar-name" class="user-name"></div>
+          <span class="perm-badge-sm">public_profile</span>
+          <button type="button" id="btn-logout" class="btn-text">Sign out</button>
+        </div>
+      </div>
+    </aside>
+
+    <main class="app-main">
+      <!-- INBOX -->
+      <section class="view active" id="view-inbox">
+        <header class="view-header">
+          <div>
+            <span class="perm-badge">pages_messaging</span>
+            <h1>Inbox</h1>
+          </div>
+          <button type="button" id="btn-refresh-inbox" class="btn-outline-sm">Refresh</button>
+        </header>
+        <p class="perm-use-line">Read customer Messenger threads and send support replies on behalf of your Page.</p>
+        <div class="inbox-layout">
+          <div class="conv-list" id="conv-list">
+            <p class="empty-state">Select a Page to load conversations.</p>
+          </div>
+          <div class="chat-panel">
+            <div class="chat-header hidden" id="chat-header">
+              <img id="chat-avatar" alt="" />
+              <div>
+                <strong id="chat-name">Customer</strong>
+                <span id="chat-psid" class="muted"></span>
+              </div>
+            </div>
+            <div class="messages" id="messages"></div>
+            <form class="composer hidden" id="composer-form">
+              <input type="text" id="reply-input" placeholder="Type a reply…" autocomplete="off" />
+              <button type="submit" class="btn-send">Send</button>
+            </form>
+            <p class="empty-state chat-empty" id="chat-empty">Select a conversation to view messages.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ENGAGEMENT -->
+      <section class="view" id="view-engagement">
+        <header class="view-header">
+          <div>
+            <span class="perm-badge">pages_read_engagement</span>
+            <h1>Engagement</h1>
+          </div>
+          <button type="button" id="btn-refresh-posts" class="btn-outline-sm">Refresh</button>
+        </header>
+        <p class="perm-use-line">View Page posts and engagement metrics (likes, comments, shares).</p>
+        <div class="stats-row" id="engagement-stats"></div>
+        <div class="posts-feed" id="posts-feed"></div>
+      </section>
+
+      <!-- UTILITY -->
+      <section class="view" id="view-utility">
+        <header class="view-header">
+          <div>
+            <span class="perm-badge">pages_utility_messaging</span>
+            <h1>Utility Messages</h1>
+          </div>
+        </header>
+        <p class="perm-use-line">Send order confirmations, shipping updates, and account alerts to customers who contacted your Page.</p>
+        <form class="utility-form" id="utility-form">
+          <label>Customer (from inbox)</label>
+          <select id="utility-recipient">
+            <option value="">— Select customer —</option>
+          </select>
+          <label>Message type</label>
+          <select id="utility-tag">
+            <option value="POST_PURCHASE_UPDATE">Order / shipping update</option>
+            <option value="CONFIRMED_EVENT_UPDATE">Appointment / event confirmation</option>
+            <option value="ACCOUNT_UPDATE">Account notification</option>
+          </select>
+          <label>Message</label>
+          <textarea id="utility-body" rows="4" placeholder="Your order #4521 has shipped and will arrive Friday."></textarea>
+          <button type="submit" class="btn-primary">Send utility message</button>
+        </form>
+        <div id="utility-status" class="status-msg hidden"></div>
+      </section>
+
+      <!-- APP REVIEW -->
+      <section class="view" id="view-review">
+        <header class="view-header">
+          <h1>Submission Center</h1>
+          <button type="button" id="btn-start-review-guide" class="btn-primary">Start walkthrough</button>
+        </header>
+
+        <div class="readiness-panel">
+          <div class="readiness-head">
+            <div>
+              <span class="readiness-label">Approval readiness</span>
+              <div id="readiness-score" class="readiness-score bad">0%</div>
+            </div>
+            <div id="submit-verdict" class="submit-verdict not-ready">
+              <strong>⛔ Not ready</strong><p>Fix blockers below before submitting to Meta.</p>
+            </div>
+          </div>
+          <h3 class="subsection-title">Blockers (fix all before submit)</h3>
+          <ul class="blocker-list" id="readiness-blockers"></ul>
+        </div>
+
+        <div class="test-creds-box">
+          <h3 class="subsection-title">Test credentials for Meta (required)</h3>
+          <div class="creds-row">
+            <label>Test email</label>
+            <input type="email" id="test-email" placeholder="faisalboss788@gmail.com" />
+          </div>
+          <div class="creds-row">
+            <label>Test password</label>
+            <input type="password" id="test-password" placeholder="Password for reviewer" />
+          </div>
+          <div class="creds-row">
+            <label>Test Page name</label>
+            <input type="text" id="test-page-name" placeholder="Your Facebook Page name" />
+          </div>
+        </div>
+
+        <div class="meta-test-run-box">
+          <h3 class="subsection-title">Make Meta Testing green</h3>
+          <p class="perm-use-line">Click below while logged in. Then refresh Meta → App Review → Testing (wait 5–30 min).</p>
+          <button type="button" id="btn-run-meta-tests" class="btn-primary">Run all API tests for Meta</button>
+          <button type="button" id="btn-test-pages-list" class="btn-outline-sm">Test pages_show_list only</button>
+          <div id="granted-scopes-panel" class="scopes-panel hidden"></div>
+          <div id="meta-test-log" class="meta-test-log"></div>
+          <p class="meta-muted" style="margin-top:10px">
+            <strong>pages_show_list grey?</strong> High call count ≠ Completed. Logout → login → click
+            <em>Test pages_show_list only</em> → wait 30 min → refresh Meta Testing. Keep only Messenger use case.
+          </p>
+        </div>
+
+        <h3 class="subsection-title">Meta dashboard checklist</h3>
+        <p class="meta-muted">URLs Meta mein add ho chuki hain? Neeche <strong>tick</strong> karo ya button dabao — app Meta ko automatically check nahi karti.</p>
+        <button type="button" id="btn-meta-done" class="btn-primary" style="margin-bottom:12px">✓ Meta URLs + setup done (tick all)</button>
+        <div class="meta-chk-grid">
+          <label><input type="checkbox" id="meta-chk-privacy" /> Privacy Policy URL added in Meta Basic</label>
+          <label><input type="checkbox" id="meta-chk-deletion" /> Data deletion URL added in Meta Basic</label>
+          <label><input type="checkbox" id="meta-chk-oauth" /> OAuth redirect URL matches this site</label>
+          <label><input type="checkbox" id="meta-chk-tester" /> Using Admin account for test (Meta test user blocked OK)</label>
+          <label><input type="checkbox" id="meta-chk-screencast" /> Screencast recorded (all 6 permissions)</label>
+        </div>
+
+        <h3 class="subsection-title">Video script</h3>
+        <pre class="code-block" id="video-script" style="max-height:160px;overflow:auto"></pre>
+        <button type="button" id="btn-copy-script" class="btn-outline-sm">Copy video script</button>
+
+        <p class="perm-use-line">Complete each app step, then submit in Meta Developer portal.</p>
+        <ul class="review-checklist" id="review-checklist">
+          <li id="check-profile"><span class="check-icon">○</span> <code>public_profile</code> — User name visible in sidebar</li>
+          <li id="check-pages"><span class="check-icon">○</span> <code>pages_show_list</code> — Page dropdown loaded</li>
+          <li id="check-messaging"><span class="check-icon">○</span> <code>pages_messaging</code> — Reply sent from Inbox</li>
+          <li id="check-engagement"><span class="check-icon">○</span> <code>pages_read_engagement</code> — Posts loaded in Engagement</li>
+          <li id="check-utility"><span class="check-icon">○</span> <code>pages_utility_messaging</code> — Utility message sent</li>
+          <li id="check-metadata"><span class="check-icon">○</span> <code>pages_manage_metadata</code> — Page webhooks subscribed in Settings</li>
+        </ul>
+        <h3 class="subsection-title">Copy permission answers for Meta form</h3>
+        <div id="permission-answers"></div>
+        <h3 class="subsection-title">URLs for Meta Basic Settings</h3>
+        <ul class="url-list" id="meta-urls"></ul>
+        <h3 class="subsection-title">Test instructions</h3>
+        <textarea id="review-notes" readonly rows="12"></textarea>
+        <button type="button" id="btn-copy-notes" class="btn-outline-sm">Copy test instructions</button>
+        <button type="button" id="btn-copy-all-urls" class="btn-outline-sm">Copy all Meta URLs</button>
+      </section>
+
+      <!-- SETTINGS -->
+      <section class="view" id="view-settings">
+        <header class="view-header">
+          <div>
+            <span class="perm-badge">pages_manage_metadata</span>
+            <h1>Settings</h1>
+          </div>
+        </header>
+        <p class="perm-use-line">Connect the selected Page to real-time Messenger webhooks and manage subscription status.</p>
+        <div class="settings-blocks">
+          <div class="settings-block">
+            <h3>Page webhook connection</h3>
+            <div id="webhook-status"></div>
+            <div id="webhook-actions" class="webhook-actions"></div>
+            <p class="meta-muted" style="margin-top:12px">App callback URL (Meta dashboard):</p>
+            <pre class="code-block" id="webhook-url-display">Loading…</pre>
+            <ol class="setup-steps">
+              <li>Meta App → Messenger → Webhooks → Callback URL: <code id="webhook-callback"></code></li>
+              <li>Verify Token: Railway variable <code>VERIFY_TOKEN</code></li>
+              <li>Then click <strong>Subscribe Page to webhooks</strong> above</li>
+            </ol>
+          </div>
+          <div class="settings-block">
+            <h3>Full App Review guide</h3>
+            <p>See <a href="APP_REVIEW.md" target="_blank">APP_REVIEW.md</a> in the repository for step-by-step Meta portal instructions (Urdu + English).</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="/js/env.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/inbox.js"></script>
+  <script src="js/engagement.js"></script>
+  <script src="js/utility.js"></script>
+  <script src="js/page-meta.js"></script>
+  <script src="js/review.js"></script>
+  <script src="js/readiness.js"></script>
+  <script src="js/meta-tests.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
